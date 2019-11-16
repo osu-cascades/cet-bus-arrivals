@@ -26,11 +26,10 @@ document.addEventListener('DOMContentLoaded', function () {
         L.marker([lat, lon]).addTo(mymap);
       }
     });
-    displayData(buslayer, busicon);
-    setInterval(() => displayData(buslayer, busicon), 1000);
+    setInterval(() => displayData(mymap, buslayer, busicon), 1000);
 });
 
-function displayData(buslayer, busicon){
+function displayData(mymap, buslayer, busicon) {
   $.getJSON('/buses', function(data) {
     buslayer.clearLayers();
     for(bus of data){
@@ -71,5 +70,6 @@ function displayData(buslayer, busicon){
         let marker = L.marker([xx, yy], { icon: busicon[rte], rotationAngle: head, alt: '' + rte }).addTo(buslayer);
       }
     }
+    mymap.invalidateSize();
   });
 }
