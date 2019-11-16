@@ -11,7 +11,7 @@ def js():
 
 @app.route('/buses')
 def buses():
-  return '{}'
+  return '[]'
 
 @app.route('/stops.json')
 def stops():
