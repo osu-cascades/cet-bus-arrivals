@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
   for (let i = 0; i <= 30; i++) {
     busicon.push(
       L.icon({
-        iconUrl: '/busicon.png',
+        iconUrl: '/static/icons/busicon.png',
         iconSize:     [32, 32],
         iconAnchor:   [16, 16],
         popupAnchor:  [100, 100]
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
       for (stop of data) {
         let lat = stop.stop_lat;
         let lon = stop.stop_lon;
-        L.marker([lat, lon]).addTo(mymap);
+        L.marker([lat, lon]).bindPopup("<b>" + stop.stop_name + "</b><br>Your bus will arive in: ???").addTo(mymap);
       }
     });
     setInterval(() => displayData(mymap, buslayer, busicon), 1000);
