@@ -20,3 +20,7 @@ def stops():
 @app.route('/index.css')
 def css():
   return render_template('index.css')
+
+@app.route('/test')
+def test():
+  return 'test'
