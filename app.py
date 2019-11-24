@@ -13,6 +13,14 @@ def js():
 def buses():
   return render_template('buses.json')
 
+@app.route('/shape')
+def shape():
+  return render_template('shape.json')
+
+@app.route('/trips')
+def trips():
+  return render_template('trips.json')
+
 @app.route('/stops.json')
 def stops():
   return render_template('stops.json')

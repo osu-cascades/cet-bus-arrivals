@@ -26,7 +26,29 @@ document.addEventListener('DOMContentLoaded', function () {
         L.marker([lat, lon]).bindPopup("<b>" + stop.stop_name + "</b><br>Your bus will arive in: ???").addTo(mymap);
       }
     });
-    setInterval(() => displayData(mymap, buslayer, busicon), 1000);
+  $.getJSON('/shape', function(data){
+    let polylines = new Map();
+    for (shape_id of ["p_30", "p_31", "p_746", "p_747", "p_748"]) {
+      polylines.set(shape_id, []);
+    }
+    for(shape_point of data) {
+      if (["p_30", "p_31", "p_746", "p_747", "p_748"].includes(shape_point.shape_id)) {
+        let point = new L.LatLng(shape_point.shape_pt_lat,shape_point.shape_pt_lon);
+        polylines.get(shape_point.shape_id).push(point);
+        console.log('pushed');
+      }
+    }
+    for (pointlist of polylines) {
+      let polyline = new L.polyline(pointlist[1], {
+          color: 'red',
+          weight: 3,
+          opacity: 0.5,
+          smoothFactor: 1
+      });
+      polyline.addTo(mymap);
+    }
+  });
+  setInterval(() => displayData(mymap, buslayer, busicon), 1000);
 });
 
 function displayData(mymap, buslayer, busicon) {
