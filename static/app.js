@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
       for (stop of data) {
         let lat = stop.stop_lat;
         let lon = stop.stop_lon;
-        L.marker([lat, lon]).bindPopup("<b>" + stop.stop_name + "</b><br>Your bus will arive in: ???").addTo(mymap);
+        L.marker([lat, lon]).bindPopup("<b>" + stop.stop_name + "</b><br>Your bus will arive in: " + stop.eta).addTo(mymap);
       }
     });
   $.getJSON('/shape', function(data){
@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (["p_30", "p_31", "p_746", "p_747", "p_748"].includes(shape_point.shape_id)) {
         let point = new L.LatLng(shape_point.shape_pt_lat,shape_point.shape_pt_lon);
         polylines.get(shape_point.shape_id).push(point);
-        console.log('pushed');
       }
     }
     for (pointlist of polylines) {
