@@ -32,5 +32,17 @@ class TestSegmentMethods(unittest.TestCase):
     dist = s.distance_to(Point(-1, -1))
     self.assertEqual(dist, 2.0 ** 0.5)
 
+  def test_distance_to_n1_1_is_sqrt_2(self):
+    s = Segment(Point(0, 0), Point(1, -1))
+
+    dist = s.distance_to(Point(-1, 1))
+    self.assertEqual(dist, 2.0 ** 0.5)
+
+  def test_distance_to_2_n2_is_sqrt_2(self):
+    s = Segment(Point(0, 0), Point(1, -1))
+
+    dist = s.distance_to(Point(2, -2))
+    self.assertEqual(dist, 2.0 ** 0.5)
+
 if __name__ == '__main__':
   unittest.main()
