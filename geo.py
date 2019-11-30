@@ -1,9 +1,3 @@
-#  class Polyline:
-#    def __init__(self, points):
-#      self.points = points
-#
-#    def closest_segment(self, point):
-
 from collections import namedtuple
 
 NearestPoint = namedtuple('NearestPoint', 'point t')
@@ -12,6 +6,9 @@ class Point:
   def __init__(self, x, y):
     self.x = x
     self.y = y
+
+  def __eq__(self, other):
+    return self.x == other.x and self.y == other.y
 
   def __add__(self, point):
     return Point(self.x + point.x, self.y + point.y)
@@ -35,6 +32,9 @@ class Segment:
     self.start = start
     self.end = end
 
+  def __eq__(self, other):
+    return (self.start == other.start and self.end == other.end)
+
   def nearest_point(self, point):
     v = self.end - self.start
     u = self.start - point
@@ -49,3 +49,17 @@ class Segment:
   def distance_to(self, point):
     nearest = self.nearest_point(point)
     return nearest.point.distance_to(point)
+
+class Polyline:
+  def __init__(self, points):
+    self.points = points
+
+  def closest_segment(self, point):
+    best = None
+    for i in range(0, len(self.points) - 1):
+      s = Segment(self.points[i], self.points[i+1])
+      if best is None:
+        best = s
+      elif s.distance_to(point) < best.distance_to(point):
+        best = s
+    return best
