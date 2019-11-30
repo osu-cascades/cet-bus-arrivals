@@ -92,5 +92,19 @@ class TestPolylineMethods(unittest.TestCase):
     closest = square.closest_segment(Point(0.5, 0.5))
     self.assertEqual(closest, Segment(Point(0, 0), Point(0, 1)))
 
+  # Rule out a naive erroneous solution where you find the segment that joins
+  # the two nearest polyline vertices. This often gives the right answer
+  # but does not work in general.
+  def test_closest_segment_may_not_have_nearest_vertices(self):
+    trapezoid = Polyline([
+      Point(-10, 0),
+      Point(10, 0),
+      Point(1, 1),
+      Point(-1, 1)
+    ])
+
+    closest = trapezoid.closest_segment(Point(0, 0.1))
+    self.assertEqual(closest, Segment(Point(-10, 0), Point(10, 0)))
+
 if __name__ == '__main__':
   unittest.main()
