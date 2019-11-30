@@ -39,7 +39,12 @@ class Segment:
     v = self.end - self.start
     u = self.start - point
     t = - (v.dot(u) / v.dot(v))
-    return NearestPoint(point = self.start + v.scale(t), t = t)
+    if t < 0:
+      return NearestPoint(point = self.start, t = t)
+    elif t > 1:
+      return NearestPoint(point = self.end, t = t)
+    else:
+      return NearestPoint(point = self.start + v.scale(t), t = t)
 
   def distance_to(self, point):
     nearest = self.nearest_point(point)
