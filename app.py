@@ -4,7 +4,13 @@ import urllib.request
 import json
 from bs4 import BeautifulSoup
 
+from geo import Segment, Point, Polyline
+
+from bus_routes import enumerate_shapes, guess_route
+
 app = Flask(__name__)
+
+shapes = enumerate_shapes()
 
 @app.route('/')
 def root():
@@ -19,9 +25,13 @@ def buses():
   handle = urllib.request.urlopen('http://ridecenter.org:7016')
   json_str = handle.read().decode('utf8')
   soup = BeautifulSoup(json_str, 'html.parser')
+  json_obj = json.loads(soup.body.string)
+  for bus_record in json_obj:
+    bus_record['route'] = str(guess_route(shapes, bus_record))
+  print(json_obj)
   response = app.response_class(
-      response=soup.body.string,
-      mimetype='application/json'
+    response=json.dumps(json_obj),
+    mimetype='application/json'
   )
   return response
 
