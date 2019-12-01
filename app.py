@@ -5,7 +5,6 @@ import json
 from bs4 import BeautifulSoup
 
 from geo import Segment, Point, Polyline
-
 from bus_routes import enumerate_shapes, guess_route
 
 app = Flask(__name__)

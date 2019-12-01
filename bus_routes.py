@@ -13,9 +13,9 @@ def enumerate_shapes():
       shape_to_route[trip["shape_id"]] = trip["route_id"]
   with open('templates/shape.json') as shape_file:
     shape_json = json.loads(shape_file.read())
-    for i in range(0, len(shape_json)-1):
-      point = Point(shape_json[i]["shape_pt_lat"], shape_json[i]["shape_pt_lon"])
-      shape_id = shape_json[i]["shape_id"]
+    for shape in shape_json:
+      point = Point(shape["shape_pt_lat"], shape["shape_pt_lon"])
+      shape_id = shape["shape_id"]
       route_id = shape_to_route[shape_id]
       shapes.setdefault((shape_id, route_id), Polyline([])).points.append(point)
   return shapes
