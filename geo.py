@@ -63,3 +63,9 @@ class Polyline:
       elif s.distance_to(point) < best.distance_to(point):
         best = s
     return best
+
+  def __eq__(self, other):
+    is_eq = True
+    for (s, o) in zip(self.points, other.points):
+      is_eq = (is_eq and (s == o))
+    return is_eq

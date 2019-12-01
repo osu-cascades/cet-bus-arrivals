@@ -8,7 +8,11 @@ def enumerate_shapes(trips_json, shape_json):
   shapes = {}
   shape_to_route = {}
   for trip in trips_json:
-    shape_to_route[trip["shape_id"]] = trip["route_id"]
+    if trip["shape_id"] in shape_to_route:
+      if not shape_to_route[trip["shape_id"]] == trip["route_id"]:
+        raise ValueError
+    else:
+      shape_to_route[trip["shape_id"]] = trip["route_id"]
   for shape in shape_json:
     point = Point(shape["shape_pt_lat"], shape["shape_pt_lon"])
     shape_id = shape["shape_id"]

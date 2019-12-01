@@ -4,7 +4,7 @@ import unittest
 class TestSegmentMethods(unittest.TestCase):
   def test_distance_to_start_is_zero(self):
     s = Segment(Point(0, 0), Point(1, 1))
-    
+
     dist = s.distance_to(Point(0, 0))
     self.assertEqual(dist, 0)
 
