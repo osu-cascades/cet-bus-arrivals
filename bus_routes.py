@@ -4,20 +4,16 @@ from geo import Segment, Point, Polyline
 
 # Parse shape.json into a map where keys are shape ids and values are the
 # shapes represented as Polylines.
-def enumerate_shapes():
+def enumerate_shapes(trips_json, shape_json):
   shapes = {}
   shape_to_route = {}
-  with open('templates/trips.json') as trips_file:
-    trips_json = json.loads(trips_file.read())
-    for trip in trips_json:
-      shape_to_route[trip["shape_id"]] = trip["route_id"]
-  with open('templates/shape.json') as shape_file:
-    shape_json = json.loads(shape_file.read())
-    for shape in shape_json:
-      point = Point(shape["shape_pt_lat"], shape["shape_pt_lon"])
-      shape_id = shape["shape_id"]
-      route_id = shape_to_route[shape_id]
-      shapes.setdefault((shape_id, route_id), Polyline([])).points.append(point)
+  for trip in trips_json:
+    shape_to_route[trip["shape_id"]] = trip["route_id"]
+  for shape in shape_json:
+    point = Point(shape["shape_pt_lat"], shape["shape_pt_lon"])
+    shape_id = shape["shape_id"]
+    route_id = shape_to_route[shape_id]
+    shapes.setdefault((shape_id, route_id), Polyline([])).points.append(point)
   return shapes
 
 # Get the route that has the closest segment. This is likely to be the route

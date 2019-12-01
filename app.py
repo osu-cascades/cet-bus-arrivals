@@ -9,7 +9,11 @@ from bus_routes import enumerate_shapes, guess_route
 
 app = Flask(__name__)
 
-shapes = enumerate_shapes()
+with open('templates/shape.json') as shape_file:
+  with open('templates/trips.json') as trips_file:
+    shape_json = json.loads(shape_file.read())
+    trips_json = json.loads(trips_file.read())
+    shapes = enumerate_shapes(trips_json, shape_json)
 
 @app.route('/')
 def root():
