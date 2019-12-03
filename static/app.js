@@ -89,6 +89,7 @@ function displayData(mymap, buslayer, busicon) {
       }
       if (x != '-' && y != '-' && !isNaN(rte) && !isNaN(heading) && !isNaN(head)) {
         let marker = L.marker([xx, yy], { icon: busicon[rte], rotationAngle: head, alt: '' + rte }).addTo(buslayer);
+        L.marker([xx, yy]).bindPopup("<b> Bus " + bus.bus + " is on Route: "+ bus.Route + "</b>").addTo(mymap);
       }
     }
     mymap.invalidateSize();
