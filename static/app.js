@@ -61,6 +61,8 @@ function displayData(mymap, buslayer, busicon) {
       let heading = '-';
       let head = 0.0;
       let rte = 0;
+      let start = bus.route.length -5;
+      let end = bus.route.length - 4;
       if (bus.latitude != null) {
         x = bus.latitude;
         try {
@@ -88,8 +90,8 @@ function displayData(mymap, buslayer, busicon) {
         rte = parseInt(bus.Route);
       }
       if (x != '-' && y != '-' && !isNaN(rte) && !isNaN(heading) && !isNaN(head)) {
-        let marker = L.marker([xx, yy], { icon: busicon[rte], rotationAngle: head, alt: '' + rte }).addTo(buslayer);
-        L.marker([xx, yy]).bindPopup("<b> Bus " + bus.bus + " is on Route: "+ bus.Route + "</b>").addTo(mymap);
+        let marker = L.marker([xx, yy], { icon: busicon[rte], rotationAngle: head, alt: '' + rte }).bindPopup("<b> Bus " + bus.busNumber + " is on Route: "+ bus.route.substr(start,end).replace(/\s+|\)/g, '') + "</b>").addTo(buslayer);
+
       }
     }
     mymap.invalidateSize();
