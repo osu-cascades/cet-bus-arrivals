@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
         iconUrl: '/static/icons/busicon.png',
         iconSize:     [32, 32],
         iconAnchor:   [16, 16],
-        popupAnchor:  [100, 100]
+        popupAnchor:  [0, -10]
       }));
   }
   $.getJSON('/stops.json', function(data) {
