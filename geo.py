@@ -54,15 +54,19 @@ class Polyline:
   def __init__(self, points):
     self.points = points
 
-  def closest_segment(self, point):
+  def closest_segment(self, point, get_distance=False):
     best = None
     for i in range(0, len(self.points) - 1):
       s = Segment(self.points[i], self.points[i+1])
+      d = s.distance_to(point)
       if best is None:
-        best = s
-      elif s.distance_to(point) < best.distance_to(point):
-        best = s
-    return best
+        best = (s, d)
+      elif d < best[0].distance_to(point):
+        best = (s, d)
+    if get_distance:
+      return best
+    else:
+      return best[0]
 
   def __eq__(self, other):
     is_eq = True

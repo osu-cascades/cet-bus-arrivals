@@ -1,4 +1,5 @@
 import json
+import operator
 
 from geo import Segment, Point, Polyline
 
@@ -26,6 +27,8 @@ def guess_route(shapes, bus_record):
   closest_so_far = None
   closest_shape_key = None
   for shape_key, shape in shapes.items():
+    # TODO: This shouldn't be handled here; this function shouldn't accept
+    # invalid buses
     try:
       bus_point = Point(
         float(bus_record["latitude"]),
@@ -41,3 +44,20 @@ def guess_route(shapes, bus_record):
       closest_so_far = closest_seg
       closest_shape_key = shape_key
   return closest_shape_key
+
+def mean(xs):
+  return sum(xs) / len(xs)
+
+def route_histo(shapes, bus_history):
+  shapes_histo = {}
+  for bus_record in bus_history:
+    bus_point = Point(
+      float(bus_record["latitude"]),
+      float(bus_record["longitude"]))
+    for shape_id, shape in shapes.items():
+      closest_seg, distance = shape.closest_segment(bus_point, get_distance=True)
+      if shape_id in shapes_histo:
+        shapes_histo[shape_id].append(distance)
+      else:
+        shapes_histo[shape_id] = []
+  return [(shape, mean(distances)) for shape, distances in shapes_histo.items()]
