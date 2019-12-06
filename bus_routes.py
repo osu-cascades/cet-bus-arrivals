@@ -45,14 +45,19 @@ def guess_route(shapes, bus_record):
       closest_shape_key = shape_key
   return closest_shape_key
 
-def guess_route_from_history(shapes, bus_history, max_distance):
-  possible_shapes = set(shapes)
+def mean(xs):
+  return sum(xs) / len(xs)
+
+def route_histo(shapes, bus_history):
+  shapes_histo = {}
   for bus_record in bus_history:
     bus_point = Point(
       float(bus_record["latitude"]),
       float(bus_record["longitude"]))
     for shape_id, shape in shapes.items():
       closest_seg, distance = shape.closest_segment(bus_point, get_distance=True)
-      if distance > max_distance:
-        possible_shapes.remove(shape_id)
-  return possible_shapes
+      if shape_id in shapes_histo:
+        shapes_histo[shape_id].append(distance)
+      else:
+        shapes_histo[shape_id] = []
+  return [(shape, mean(distances)) for shape, distances in shapes_histo.items()]

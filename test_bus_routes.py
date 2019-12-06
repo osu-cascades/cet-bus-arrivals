@@ -85,7 +85,7 @@ class TestBusRoutesMethods(unittest.TestCase):
     closest = guess_route(shapes, bus)
     self.assertEqual(closest[1], "route 1")
 
-  def test_guess_route_from_history(self):
+  def test_route_histo(self):
     trips_json = [
         {"shape_id": 0, "route_id": "route 1"},
         {"shape_id": 1, "route_id": "route 2"}
@@ -109,14 +109,13 @@ class TestBusRoutesMethods(unittest.TestCase):
         {"latitude": 0, "longitude": 2},
         {"latitude": 0, "longitude": 3}
       ]
-    (closest,) = guess_route_from_history(shapes, bus_history, max_distance=0.1)
-    self.assertEqual(closest[1], "route 1")
+    histo = route_histo(shapes, bus_history)
+    self.assertEqual(min(histo, key=lambda x: x[1])[0][1], "route 1")
 
     bus_history[3] = { "latitude": 1, "longitude": 2 }
 
-    (closest,) = guess_route_from_history(shapes, bus_history, max_distance=0.1)
-    self.assertEqual(closest[1], "route 2")
-
+    histo = route_histo(shapes, bus_history)
+    self.assertEqual(min(histo, key=lambda x: x[1])[0][1], "route 2")
 
 if __name__ == '__main__':
   unittest.main()
