@@ -101,5 +101,44 @@ class TestBusRoutesMethods(unittest.TestCase):
     closest = guess_route(shapes, bus)
     self.assertEqual(closest[1], "route 1")
 
+  def test_guess_route_from_history(self):
+    trips_json = json.loads("""
+      [
+        {"shape_id": 0, "route_id": "route 1"},
+        {"shape_id": 1, "route_id": "route 2"}
+      ]
+    """)
+    shapes_json = json.loads("""
+      [
+        {"shape_pt_lat": 0, "shape_pt_lon": 0, "shape_id": 0},
+        {"shape_pt_lat": 0, "shape_pt_lon": 1, "shape_id": 0},
+        {"shape_pt_lat": 0, "shape_pt_lon": 2, "shape_id": 0},
+        {"shape_pt_lat": 0, "shape_pt_lon": 3, "shape_id": 0},
+
+        {"shape_pt_lat": 0, "shape_pt_lon": 0, "shape_id": 1},
+        {"shape_pt_lat": 0, "shape_pt_lon": 1, "shape_id": 1},
+        {"shape_pt_lat": 0, "shape_pt_lon": 2, "shape_id": 1},
+        {"shape_pt_lat": 1, "shape_pt_lon": 2, "shape_id": 1}
+      ]
+    """)
+    shapes = enumerate_shapes(trips_json, shapes_json)
+
+    bus_history = json.loads("""
+      [
+        {"latitude": 0, "longitude": 0},
+        {"latitude": 0, "longitude": 1},
+        {"latitude": 0, "longitude": 2},
+        {"latitude": 0, "longitude": 3}
+      ]
+    """)
+    closest = guess_route_from_history(shapes, bus_history)
+    self.assertEqual(closest[1], "route 1")
+
+    bus_history[3] = { "latitude": 1, "longitude": 2 }
+
+    closest = guess_route_from_history(shapes, bus_history)
+    self.assertEqual(closest[1], "route 2")
+
+
 if __name__ == '__main__':
   unittest.main()
