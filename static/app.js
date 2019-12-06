@@ -27,48 +27,30 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   $.getJSON('/shape', function(data){
-    //route 290
-    displayShape(mymap,["p_30", "p_31", "p_746", "p_747", "p_748"],data,'red');
-    //route 291
-    displayShape(mymap,["p_750","p_745","p_352","p_353"],data,'blue');
-    //route 292
-    displayShape(mymap,["p_749","p_1116"],data,'green');
-    //route 293
-    displayShape(mymap,["p_1113","p_1112","p_744792","p_1667","p_1668"],data,'yellow'); 
-    //route 3136
-    displayShape(mymap,["p_180304","p_176598"],data,'grey');
-    //route 3138
-    displayShape(mymap,["p_1105","p_176543"],data,'pink');
-    //route 3225
-    displayShape(mymap,["p_180576","p_9617","p_180573","p_180574","p_111380"],data,'#31FF8F');
-    //route 382
-    displayShape(mymap,["p_751","p_753","p_176606","p_176607"],data,'#6FFF31');
-    //route 4695
-    displayShape(mymap,["p_745174"],data,'#31FFEC');
-    //route 5917
-    displayShape(mymap,["p_1117","p_176608"],data,'#BD31FF');
-    //route 710
-    displayShape(mymap,["p_1109","p_1124"],data,'#FF31FF');
-    //route 711
-    displayShape(mymap,["p_1106","p_1123"],data,'#FFCD31');
-    //route 712
-    displayShape(mymap,["p_1108","p_176539"],data,'#31FFA1');
-    //route 713
-    displayShape(mymap,["p_1121","p_8009"],data,'#31D3FF');
-    //route 714
-    displayShape(mymap,["p_1114","p_176595"],data,'#8231FF');
-    //route 715
-    displayShape(mymap,["p_1110","p_176596"],data,'#4431FF');
-    //route 716
-    displayShape(mymap,["p_177368","p_177368"],data,'#F631FF');
-    //route 740
-    displayShape(mymap,["p_744877"],data,'black');
+    displayShape(mymap,["p_30", "p_31", "p_746", "p_747", "p_748"],data,'red','route 290');
+    displayShape(mymap,["p_750","p_745","p_352","p_353"],data,'blue','route 291');
+    displayShape(mymap,["p_749","p_1116"],data,'green','route 292');
+    displayShape(mymap,["p_1113","p_1112","p_744792","p_1667","p_1668"],data,'yellow','route 293'); 
+    displayShape(mymap,["p_180304","p_176598"],data,'grey','route 3136');
+    displayShape(mymap,["p_1105","p_176543"],data,'pink','route 3138');
+    displayShape(mymap,["p_180576","p_9617","p_180573","p_180574","p_111380"],data,'#31FF8F','route 3225');
+    displayShape(mymap,["p_751","p_753","p_176606","p_176607"],data,'#6FFF31','route 382');
+    displayShape(mymap,["p_745174"],data,'#31FFEC','route 4695');
+    displayShape(mymap,["p_1117","p_176608"],data,'#BD31FF','route 5917');
+    displayShape(mymap,["p_1109","p_1124"],data,'#FF31FF','route 710');
+    displayShape(mymap,["p_1106","p_1123"],data,'#FFCD31','route 711');
+    displayShape(mymap,["p_1108","p_176539"],data,'#31FFA1','route 712');
+    displayShape(mymap,["p_1121","p_8009"],data,'#31D3FF','route 713');
+    displayShape(mymap,["p_1114","p_176595"],data,'#8231FF','route 714');
+    displayShape(mymap,["p_1110","p_176596"],data,'#4431FF','route 715');
+    displayShape(mymap,["p_177368","p_177368"],data,'#F631FF','route 716');
+    displayShape(mymap,["p_744877"],data,'black','route 740');
 
   });
   setInterval(() => displayData(mymap, buslayer, busicon), 1000);
 });
 
-function displayShape(mymap, shape_id_list,data,shape_color){
+function displayShape(mymap, shape_id_list,data,shape_color,route_id){
   let polylines = new Map();
   for (shape_id of shape_id_list) {
     polylines.set(shape_id, []);
@@ -86,7 +68,7 @@ function displayShape(mymap, shape_id_list,data,shape_color){
         opacity: 0.5,
         smoothFactor: 1
     });
-    polyline.addTo(mymap);
+    polyline.bindPopup("<b>"+route_id+"</b>").addTo(mymap);
   }
 }
 
