@@ -2,7 +2,7 @@ import json
 import unittest
 
 from geo import Point, Segment, Polyline
-from bus_routes import enumerate_shapes, guess_route
+from bus_routes import *
 
 class TestBusRoutesMethods(unittest.TestCase):
   def test_enumate_shapes_has_correct_keys(self):
@@ -131,12 +131,12 @@ class TestBusRoutesMethods(unittest.TestCase):
         {"latitude": 0, "longitude": 3}
       ]
     """)
-    closest = guess_route_from_history(shapes, bus_history)
+    (closest,) = guess_route_from_history(shapes, bus_history, max_distance=0.1)
     self.assertEqual(closest[1], "route 1")
 
     bus_history[3] = { "latitude": 1, "longitude": 2 }
 
-    closest = guess_route_from_history(shapes, bus_history)
+    (closest,) = guess_route_from_history(shapes, bus_history, max_distance=0.1)
     self.assertEqual(closest[1], "route 2")
 
 
