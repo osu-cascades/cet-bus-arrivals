@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //route 3138
     displayShape(mymap,["p_1105","p_176543"],data,'pink');
     //route 3225
-    displayShape(mymap,["p_180576","p_9617","p_180573","p_180574","p_111380"],data,'pink');
+    displayShape(mymap,["p_180576","p_9617","p_180573","p_180574","p_111380"],data,'#31FF8F');
     //route 382
     displayShape(mymap,["p_751","p_753","p_176606","p_176607"],data,'#6FFF31');
     //route 4695
@@ -89,8 +89,6 @@ function displayShape(mymap, shape_id_list,data,shape_color){
     polyline.addTo(mymap);
   }
 }
-
-
 
 function displayData(mymap, buslayer, busicon) {
   $.getJSON('/buses', function(data) {
