@@ -117,5 +117,34 @@ class TestBusRoutesMethods(unittest.TestCase):
     histo = route_histo(shapes, bus_history)
     self.assertEqual(min(histo, key=lambda x: x[1])[0][1], "route 2")
 
+  def test_passes(self):
+    route = Polyline([
+      Point(0, 0),
+      Point(0, 10)
+    ])
+
+    stop = Point(0, 5)
+
+    bus_history = [ Point(0, 4), Point(0, 5), Point(0, 6) ]
+    p = passes(bus_history, stop, route)
+    self.assertTrue(p)
+
+    bus_history = [ Point(0, 6), Point(0, 5), Point(0, 4) ]
+    p = passes(bus_history, stop, route)
+    self.assertTrue(p)
+
+    bus_history = [ Point(0, 4), Point(0, 3), Point(0, 2) ]
+    p = passes(bus_history, stop, route)
+    self.assertFalse(p)
+
+    bus_history = [ Point(0, 6), Point(0, 6), Point(0, 6) ]
+    p = passes(bus_history, stop, route)
+    self.assertFalse(p)
+
+    # Questionable edge case: should this count as passing the stop?
+    bus_history = [ Point(0, 5), Point(0, 5), Point(0, 5) ]
+    p = passes(bus_history, stop, route)
+    self.assertFalse(p)
+
 if __name__ == '__main__':
   unittest.main()

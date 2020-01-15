@@ -1,5 +1,6 @@
 import json
 import operator
+import math
 
 from geo import Segment, Point, Polyline
 
@@ -61,3 +62,12 @@ def route_histo(shapes, bus_history):
       else:
         shapes_histo[shape_id] = []
   return [(shape, mean(distances)) for shape, distances in shapes_histo.items()]
+
+def passes(bus_history, bus_stop, route):
+  sign = None
+  for observation in bus_history:
+    dist = route.distance_along(bus_stop) - route.distance_along(observation)
+    if sign is not None and sign != math.copysign(1, dist):
+      return True
+    sign = math.copysign(1, dist)
+  return False
