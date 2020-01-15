@@ -68,6 +68,26 @@ class Polyline:
     else:
       return best[0]
 
+  def distance_along(self, point):
+    nearest_to_point = None
+    prev_vertex = None
+    for i in range(0, len(self.points) - 1):
+      seg = Segment(self.points[i], self.points[i+1])
+      n = seg.nearest_point(point)
+      if nearest_to_point is None:
+        nearest_to_point = n
+        prev_vertex = i
+      elif abs(n.t) < abs(nearest_to_point.t):
+        nearest_to_point = n
+        prev_vertex = i
+
+    total_dist = 0
+    for i in range(0, prev_vertex):
+      d = self.points[i].distance_to(self.points[i+1])
+      total_dist += d
+    total_dist += self.points[prev_vertex].distance_to(nearest_to_point.point)
+    return total_dist
+
   def __eq__(self, other):
     is_eq = True
     for (s, o) in zip(self.points, other.points):

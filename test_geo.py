@@ -106,5 +106,21 @@ class TestPolylineMethods(unittest.TestCase):
     closest = trapezoid.closest_segment(Point(0, 0.1))
     self.assertEqual(closest, Segment(Point(-10, 0), Point(10, 0)))
 
+  def test_distance_along(self):
+    road = Polyline([
+      Point(0, 0),
+      Point(0, 1),
+      Point(0, 2),
+      Point(0, 3)
+    ])
+
+    bus = Point(0, 0)
+    dist = road.distance_along(bus)
+    self.assertEqual(dist, 0)
+
+    bus = Point(0.1, 2.8)
+    dist = road.distance_along(bus)
+    self.assertEqual(dist, 2.8)
+
 if __name__ == '__main__':
   unittest.main()
