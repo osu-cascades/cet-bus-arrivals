@@ -146,5 +146,27 @@ class TestBusRoutesMethods(unittest.TestCase):
     p = passes(bus_history, stop, route)
     self.assertFalse(p)
 
+  def test_passes_with_curvy_road_and_measurement_error(self):
+    route = Polyline([
+      Point(0, 0),
+      Point(0, 0.1),
+      Point(0.1, 0.2),
+      Point(0.2, 0.2),
+      Point(0.3, 0.3),
+      Point(0.3, 0.4),
+      Point(0.2, 0.5),
+      Point(0.1, 0.5),
+      Point(0, 0.6)
+    ])
+
+    stop = Point(0.1, 0.5)
+
+    bus_history = [Point(0.25, 0.25), Point(0.29, 0.29)]
+    p = passes(bus_history, stop, route)
+    self.assertFalse(p)
+    bus_history = [Point(0, 0), Point(0, 0.6)]
+    p = passes(bus_history, stop, route)
+    self.assertTrue(p)
+
 if __name__ == '__main__':
   unittest.main()

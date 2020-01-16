@@ -77,7 +77,7 @@ class Polyline:
       if nearest_to_point is None:
         nearest_to_point = n
         prev_vertex = i
-      elif abs(n.t) < abs(nearest_to_point.t):
+      elif point.distance_to(n.point) < point.distance_to(nearest_to_point.point):
         nearest_to_point = n
         prev_vertex = i
 
