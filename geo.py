@@ -1,6 +1,10 @@
 from collections import namedtuple
+from itertools import islice
 
 NearestPoint = namedtuple('NearestPoint', 'point t')
+
+def take(n, iterable):
+  return list(islice(iterable, n))
 
 class Point:
   def __init__(self, x, y):
@@ -51,18 +55,35 @@ class Segment:
     return nearest.point.distance_to(point)
 
 class Polyline:
+  class Segments:
+    def __init__(self, points):
+      self.i = 0
+      self.end = len(points) - 1
+      self.points = points
+    def __iter__(self):
+      return self
+    def __next__(self):
+      if self.i == self.end:
+        raise StopIteration
+      else:
+        seg = Segment(self.points[self.i], self.points[self.i+1])
+        self.i += 1
+        return seg
+
   def __init__(self, points):
     self.points = points
 
+  def segments(self):
+    return iter(self.Segments(self.points))
+
   def closest_segment(self, point, get_distance=False):
     best = None
-    for i in range(0, len(self.points) - 1):
-      s = Segment(self.points[i], self.points[i+1])
-      d = s.distance_to(point)
+    for segment in self.segments():
+      d = segment.distance_to(point)
       if best is None:
-        best = (s, d)
+        best = (segment, d)
       elif d < best[0].distance_to(point):
-        best = (s, d)
+        best = (segment, d)
     if get_distance:
       return best
     else:
@@ -71,19 +92,17 @@ class Polyline:
   def distance_along(self, point):
     nearest_to_point = None
     prev_vertex = None
-    for i in range(0, len(self.points) - 1):
-      seg = Segment(self.points[i], self.points[i+1])
-      n = seg.nearest_point(point)
+    for i, segment in enumerate(self.segments()):
+      n = segment.nearest_point(point)
       if nearest_to_point is None:
         nearest_to_point = n
         prev_vertex = i
       elif point.distance_to(n.point) < point.distance_to(nearest_to_point.point):
         nearest_to_point = n
         prev_vertex = i
-
     total_dist = 0
-    for i in range(0, prev_vertex):
-      d = self.points[i].distance_to(self.points[i+1])
+    for segment in take(prev_vertex, self.segments()):
+      d = segment.start.distance_to(segment.end)
       total_dist += d
     total_dist += self.points[prev_vertex].distance_to(nearest_to_point.point)
     return total_dist
