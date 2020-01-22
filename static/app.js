@@ -50,25 +50,31 @@ document.addEventListener('DOMContentLoaded', function () {
   setInterval(() => displayData(mymap, buslayer, busicon), 1000);
 });
 
+function clickRoute(mymap, pointlist) {
+  mymap.fitBounds(pointlist);
+}
+
 function displayShape(mymap, shape_id_list,data,shape_color,route_id){
   let polylines = new Map();
-  for (shape_id of shape_id_list) {
+  for (let shape_id of shape_id_list) {
     polylines.set(shape_id, []);
   }
-  for(shape_point of data) {
+  for (let shape_point of data) {
     if (shape_id_list.includes(shape_point.shape_id)) {
       let point = new L.LatLng(shape_point.shape_pt_lat,shape_point.shape_pt_lon);
       polylines.get(shape_point.shape_id).push(point);
     }
   }
-  for (pointlist of polylines) {
+  for (let pointlist of polylines) {
     let polyline = new L.polyline(pointlist[1], {
         color: shape_color,
         weight: 3,
         opacity: 0.5,
         smoothFactor: 1
     });
-    polyline.bindPopup("<b>"+route_id+"</b>").addTo(mymap);
+    polyline.bindPopup("<b>"+route_id+"</b>").on('click', e => {
+      clickRoute(mymap, pointlist[1]);
+    }).addTo(mymap);
   }
 }
 
@@ -113,7 +119,7 @@ function displayData(mymap, buslayer, busicon) {
       }
       if (x != '-' && y != '-' && !isNaN(rte) && !isNaN(heading) && !isNaN(head)) {
         let marker = L.marker([xx, yy], { icon: busicon[rte], rotationAngle: head, alt: '' + rte }).bindPopup("<b> Bus " + bus.busNumber + " is on Route: "+ bus.route.substr(start,end).replace(/\s+|\)/g, '') + "</b>").addTo(buslayer);
-
+       // let marker = L.marker([xx, yy], { icon: busicon[rte], rotationAngle: head, alt: '' + rte }).on('click',clickRoute).addTo(buslayer);
       }
     }
     mymap.invalidateSize();
