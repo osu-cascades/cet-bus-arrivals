@@ -19,6 +19,10 @@ with open('templates/shape.json') as shape_file:
 def root():
   return render_template('index.html')
 
+@app.route('/route.show')
+def routeShow():
+  return render_template('route.html')
+
 @app.route('/app.js')
 def js():
   url_for('static', filename='app.js')
