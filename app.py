@@ -4,8 +4,8 @@ import urllib.request
 import json
 from bs4 import BeautifulSoup
 
-from geo import Segment, Point, Polyline
-from bus_routes import enumerate_shapes, guess_route
+from cet_bus.geo import Segment, Point, Polyline
+from cet_bus.bus_routes import enumerate_shapes, guess_route
 
 app = Flask(__name__)
 
