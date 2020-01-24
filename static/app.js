@@ -1,6 +1,8 @@
 let focusedRoute = null;
 let polylineLayer;
 let routes = new Map();
+let info = L.control();
+let div;
 
 let route_shapes = {
   'route 290': ["p_30", "p_31", "p_746", "p_747", "p_748"],
@@ -22,7 +24,6 @@ let route_shapes = {
   'route 740': ["p_744877"],
   'route 3225': ["p_180576","p_9617","p_180573","p_180574","p_111380"]
 };
-18
 let route_colors =[
   'red',
   'blue',
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
     id: 'mapbox.streets',
     accessToken: 'pk.eyJ1IjoicnJydWtvIiwiYSI6ImNrMmdiNmV6ODBkejAzY3BoNW90N2RiM3AifQ.P83jUlQTXOXqM5nLW8EhDg'
   }).addTo(mymap);
-  let marker = L.marker([44.0583, -121.3154]).addTo(mymap);
+  //let marker = L.marker([44.0583, -121.3154]).addTo(mymap);
   let busicon = [];
 
   for (let i = 0; i <= 30; i++) {
@@ -82,6 +83,19 @@ document.addEventListener('DOMContentLoaded', function () {
       i++;
     }
   });
+
+  info.onAdd = function(mymap){
+    div = L.DomUtil.create('div','info');
+    info.update()
+    return div;
+  };
+
+  info.update = function(data){
+    div.innerHTML = '<h4>Route Information</h4>' + (data ? '<b>' + data + '</b> <br /><a href = /> Reset Map </a>': 'please click on a route');
+  };
+
+  info.addTo(mymap);
+
   setInterval(() => displayData(mymap, buslayer, busicon), 1000);
 });
 
@@ -91,6 +105,7 @@ function clickRoute(mymap, route_id) {
   for (shape of shapes.values()) {
     verts = verts.concat(shape[1]);
   }
+  info.update(route_id);
   mymap.fitBounds(verts);
 }
 
@@ -103,7 +118,7 @@ function drawRoute(mymap, route_id, color) {
       opacity: 0.5,
       smoothFactor: 1
     });
-    polyline.bindPopup("<b>"+route_id+"</b>").on('click', e => clickRoute(mymap, route_id)).addTo(polylineLayer);
+    polyline.on('click', e => clickRoute(mymap, route_id)).addTo(polylineLayer);
   }
 }
 
