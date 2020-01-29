@@ -1,5 +1,4 @@
 let focusedRoute = null;
-let polylineArray;
 let routes = new Map();
 let info = L.control();
 let div;
@@ -23,6 +22,27 @@ let route_shapes = {
   'route 716': ["p_177368","p_177368"],
   'route 740': ["p_744877"],
   'route 3225': ["p_180576","p_9617","p_180573","p_180574","p_111380"]
+};
+
+let polylineArray = {
+  'route 290': "need to initialize",
+  'route 291': "need to initialize",
+  'route 292': "need to initialize",
+  'route 293': "need to initialize",
+  'route 3136': "need to initialize",
+  'route 3138': "need to initialize",
+  'route 4695': "need to initialize",
+  'route 5917': "need to initialize",
+  'route 382': "need to initialize",
+  'route 710': "need to initialize",
+  'route 711': "need to initialize",
+  'route 712': "need to initialize",
+  'route 713': "need to initialize",
+  'route 714': "need to initialize",
+  'route 715': "need to initialize",
+  'route 716': "need to initialize",
+  'route 740': "need to initialize",
+  'route 3225': "need to initialize"
 };
 let route_colors =[
   'red',
@@ -48,10 +68,10 @@ let route_colors =[
 document.addEventListener('DOMContentLoaded', function () {
   const mymap = L.map('mapid').setView([44.0583, -121.3154], 13);
   let buslayer = L.layerGroup().addTo(mymap);
-  polylineArray = new Array();
-  for( i = 0; i < 18; i++){
-    polylineArray.push(L.layerGroup().addTo(mymap));
-  }
+  for(key in polylineArray){
+    polylineArray[key] = L.layerGroup().addTo(mymap);
+  };
+
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
@@ -82,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
     for (key in route_shapes) {
       color = route_colors[i];
       initializeRoutes(route_shapes[key], data, key);
-      drawRoute(mymap, key, color, i);
+      drawRoute(mymap, key, color,i);
       i++;
     }
   });
@@ -112,14 +132,7 @@ function clickRoute(mymap, route_id) {
   mymap.fitBounds(verts);
 }
 
-/*
-create an array of polyline layers, iterate through the routes until you have a layer for each route. 
-then add each stop to each route layer.
-
-then figure out how to set the layers to be visible and invisible. 
-*/
-
-function drawRoute(mymap, route_id, color, num) {
+function drawRoute(mymap, route_id, color,num) {
   let pointlists = routes.get(route_id);
   for (pointlist of pointlists) {
     let polyline = new L.polyline(pointlist[1], {
@@ -128,7 +141,8 @@ function drawRoute(mymap, route_id, color, num) {
       opacity: 0.5,
       smoothFactor: 1
     });
-    polyline.on('click', e => clickRoute(mymap, route_id)).addTo(polylineArray[num]);
+    
+    polyline.on('click', e => clickRoute(mymap, route_id)).addTo(polylineArray[route_id]);
     
   }
 }
