@@ -1,5 +1,5 @@
 let focusedRoute = null;
-let polylineLayer;
+let polylineArray;
 let routes = new Map();
 let info = L.control();
 let div;
@@ -48,7 +48,10 @@ let route_colors =[
 document.addEventListener('DOMContentLoaded', function () {
   const mymap = L.map('mapid').setView([44.0583, -121.3154], 13);
   let buslayer = L.layerGroup().addTo(mymap);
-  polylineLayer = L.layerGroup().addTo(mymap);
+  polylineArray = new Array();
+  for( i = 0; i < 18; i++){
+    polylineArray.push(L.layerGroup().addTo(mymap));
+  }
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
@@ -75,11 +78,11 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   $.getJSON('/shape', function(data) {
-    i = 0;
+    let i = 0;
     for (key in route_shapes) {
       color = route_colors[i];
       initializeRoutes(route_shapes[key], data, key);
-      drawRoute(mymap, key, color);
+      drawRoute(mymap, key, color, i);
       i++;
     }
   });
@@ -109,7 +112,14 @@ function clickRoute(mymap, route_id) {
   mymap.fitBounds(verts);
 }
 
-function drawRoute(mymap, route_id, color) {
+/*
+create an array of polyline layers, iterate through the routes until you have a layer for each route. 
+then add each stop to each route layer.
+
+then figure out how to set the layers to be visible and invisible. 
+*/
+
+function drawRoute(mymap, route_id, color, num) {
   let pointlists = routes.get(route_id);
   for (pointlist of pointlists) {
     let polyline = new L.polyline(pointlist[1], {
@@ -118,7 +128,8 @@ function drawRoute(mymap, route_id, color) {
       opacity: 0.5,
       smoothFactor: 1
     });
-    polyline.on('click', e => clickRoute(mymap, route_id)).addTo(polylineLayer);
+    polyline.on('click', e => clickRoute(mymap, route_id)).addTo(polylineArray[num]);
+    
   }
 }
 
