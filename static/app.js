@@ -90,13 +90,26 @@ document.addEventListener('DOMContentLoaded', function () {
         popupAnchor:  [0, -10]
       }));
   }
-  $.getJSON('/stops.json', function(data) {
-      for (stop of data) {
+ 
+  for(key in polylineArray){
+    let route;
+    let route_id = key;
+    if(key.length == 9){
+      route = key.slice(-3);
+      } 
+    else{
+      route = key.slice(-4);
+      }
+    $.getJSON('/stops/'+route,function(data){
+      for(stop of data){
         let lat = stop.stop_lat;
         let lon = stop.stop_lon;
-        L.marker([lat, lon]).bindPopup("<b>" + stop.stop_name + "</b><br>Your bus will arive in: " + stop.eta).addTo(mymap);
+        L.marker([lat, lon]).bindPopup("<b>" + stop.stop_name + "</b><br>Your bus will arive in: ???").addTo(polylineArray[route_id]);
       }
     });
+    
+  }
+
   $.getJSON('/shape', function(data) {
     let i = 0;
     for (key in route_shapes) {
@@ -129,6 +142,11 @@ function clickRoute(mymap, route_id) {
     verts = verts.concat(shape[1]);
   }
   info.update(route_id);
+  for(key in polylineArray){
+    if(key != route_id){
+      mymap.removeLayer(polylineArray[key]);
+    }
+  }
   mymap.fitBounds(verts);
 }
 
@@ -141,7 +159,7 @@ function drawRoute(mymap, route_id, color,num) {
       opacity: 0.5,
       smoothFactor: 1
     });
-    
+
     polyline.on('click', e => clickRoute(mymap, route_id)).addTo(polylineArray[route_id]);
     
   }
