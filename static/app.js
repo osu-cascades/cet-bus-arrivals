@@ -4,45 +4,45 @@ let info = L.control();
 let div;
 
 let route_shapes = {
-  'route 290': ["p_30", "p_31", "p_746", "p_747", "p_748"],
-  'route 291': ["p_750","p_745","p_352","p_353"],
-  'route 292': ["p_749","p_1116"],
-  'route 293': ["p_1113","p_1112","p_744792","p_1667","p_1668"],
-  'route 3136': ["p_180304","p_176598"],
-  'route 3138': ["p_1105","p_176543"],
-  'route 4695': ["p_745174"],
-  'route 5917': ["p_1117","p_176608"],
-  'route 382': ["p_751","p_753","p_176606","p_176607"],
-  'route 710': ["p_1109","p_1124"],
-  'route 711': ["p_1106","p_1123"],
-  'route 712': ["p_1108","p_176539"],
-  'route 713': ["p_1121","p_8009"],
-  'route 714': ["p_1114","p_176595"],
-  'route 715': ["p_1110","p_176596"],
-  'route 716': ["p_177368","p_177368"],
-  'route 740': ["p_744877"],
-  'route 3225': ["p_180576","p_9617","p_180573","p_180574","p_111380"]
+  '290': ["p_30", "p_31", "p_746", "p_747", "p_748"],
+  '291': ["p_750","p_745","p_352","p_353"],
+  '292': ["p_749","p_1116"],
+  '293': ["p_1113","p_1112","p_744792","p_1667","p_1668"],
+  '3136': ["p_180304","p_176598"],
+  '3138': ["p_1105","p_176543"],
+  '4695': ["p_745174"],
+  '5917': ["p_1117","p_176608"],
+  '382': ["p_751","p_753","p_176606","p_176607"],
+  '710': ["p_1109","p_1124"],
+  '711': ["p_1106","p_1123"],
+  '712': ["p_1108","p_176539"],
+  '713': ["p_1121","p_8009"],
+  '714': ["p_1114","p_176595"],
+  '715': ["p_1110","p_176596"],
+  '716': ["p_177368","p_177368"],
+  '740': ["p_744877"],
+  '3225': ["p_180576","p_9617","p_180573","p_180574","p_111380"]
 };
 
 let polylineArray = {
-  'route 290': "need to initialize",
-  'route 291': "need to initialize",
-  'route 292': "need to initialize",
-  'route 293': "need to initialize",
-  'route 3136': "need to initialize",
-  'route 3138': "need to initialize",
-  'route 4695': "need to initialize",
-  'route 5917': "need to initialize",
-  'route 382': "need to initialize",
-  'route 710': "need to initialize",
-  'route 711': "need to initialize",
-  'route 712': "need to initialize",
-  'route 713': "need to initialize",
-  'route 714': "need to initialize",
-  'route 715': "need to initialize",
-  'route 716': "need to initialize",
-  'route 740': "need to initialize",
-  'route 3225': "need to initialize"
+  '290': "need to initialize",
+  '291': "need to initialize",
+  '292': "need to initialize",
+  '293': "need to initialize",
+  '3136': "need to initialize",
+  '3138': "need to initialize",
+  '4695': "need to initialize",
+  '5917': "need to initialize",
+  '382': "need to initialize",
+  '710': "need to initialize",
+  '711': "need to initialize",
+  '712': "need to initialize",
+  '713': "need to initialize",
+  '714': "need to initialize",
+  '715': "need to initialize",
+  '716': "need to initialize",
+  '740': "need to initialize",
+  '3225': "need to initialize"
 };
 let route_colors =[
   'red',
@@ -92,19 +92,12 @@ document.addEventListener('DOMContentLoaded', function () {
   }
  
   for(key in polylineArray){
-    let route;
-    let route_id = key;
-    if(key.length == 9){
-      route = key.slice(-3);
-      } 
-    else{
-      route = key.slice(-4);
-      }
-    $.getJSON('/stops/'+route,function(data){
+    let route = key;
+    $.getJSON('/stops/'+key,function(data){
       for(stop of data){
         let lat = stop.stop_lat;
         let lon = stop.stop_lon;
-        L.marker([lat, lon]).bindPopup("<b>" + stop.stop_name + "</b><br>Your bus will arive in: ???").addTo(polylineArray[route_id]);
+        L.marker([lat, lon]).bindPopup("<b>" + stop.stop_name + "</b><br>Your bus will arive in: ???").addTo(polylineArray[route]);
       }
     });
     
@@ -120,14 +113,31 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  info.onAdd = function(mymap){
+  info.onAdd = function(){
     div = L.DomUtil.create('div','info');
-    info.update()
+    info.update_info_box();
     return div;
   };
 
-  info.update = function(data){
-    div.innerHTML = '<h4>Route Information</h4>' + (data ? '<b>' + data + '</b> <br /><a href = /> Reset Map </a>': 'please click on a route');
+  info.update_info_box = function(data){
+    var button = document.createElement("button");
+    button.appendChild(document.createTextNode("Refresh Map"));
+    button.addEventListener("click",function(){ 
+      //console.log("hello sweety");
+      mymap.setView([44.0583, -121.3154], 13);
+      for(key in polylineArray){
+        if(key != data){
+          mymap.addLayer(polylineArray[key]);
+        }
+      }
+      info.update_info_box();
+    });
+    if(data){
+      div.innerHTML = '<h4>Route Information</h4><b>' + data + '</b> <br />';
+      div.appendChild(button);
+    }else{
+      div.innerHTML = '<h4>Route Information</h4> please click on a route';
+    }
   };
 
   info.addTo(mymap);
@@ -141,7 +151,7 @@ function clickRoute(mymap, route_id) {
   for (shape of shapes.values()) {
     verts = verts.concat(shape[1]);
   }
-  info.update(route_id);
+  info.update_info_box("route "+route_id);
   for(key in polylineArray){
     if(key != route_id){
       mymap.removeLayer(polylineArray[key]);
