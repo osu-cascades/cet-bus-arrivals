@@ -1,7 +1,9 @@
 let focusedRoute = null;
 let routes = new Map();
 let info = L.control();
+let infoL = L.control();
 let div;
+let legend;
 let polylineArray = {};
 
 let route_shapes = {
@@ -88,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
     for (key in route_shapes) {
       color = route_colors[i];
       initializeRoutes(route_shapes[key], data, key);
-      drawRoute(mymap, key, color,i);
+      drawRoute(mymap, key, color);
       i++;
     }
   });
@@ -118,6 +120,24 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   info.addTo(mymap);
+  
+  infoL.onAdd = function(){
+    legend = L.DomUtil.create('div', 'info');
+    legend.innerHTML = '<h4>Route Legend</h4>';
+
+    for(key in polylineArray){
+      let route_id = key;
+      let route_name = document.createElement('p','info');
+      route_name.appendChild(document.createTextNode("route " + key+ "\n"));
+      route_name.addEventListener("click",function(){
+        clickRoute(mymap,route_id)
+      });
+      legend.appendChild(route_name);
+    }
+    return legend;
+  }
+  infoL.addTo(mymap);
+
 
   setInterval(() => displayData(mymap, buslayer, busicon), 1000);
 });
@@ -130,6 +150,9 @@ function clickRoute(mymap, route_id) {
   }
   info.update_info_box(route_id);
   for(key in polylineArray){
+    if(key == route_id){
+      mymap.addLayer(polylineArray[key]);
+    }
     if(key != route_id){
       mymap.removeLayer(polylineArray[key]);
     }
@@ -137,7 +160,7 @@ function clickRoute(mymap, route_id) {
   mymap.fitBounds(verts);
 }
 
-function drawRoute(mymap, route_id, color,num) {
+function drawRoute(mymap, route_id, color) {
   let pointlists = routes.get(route_id);
   for (pointlist of pointlists) {
     let polyline = new L.polyline(pointlist[1], {
