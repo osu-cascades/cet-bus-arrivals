@@ -4,6 +4,7 @@ let info = L.control();
 let infoL = L.control();
 let div;
 let legend;
+let circleArray =[];
 let polylineArray = {};
 
 let route_shapes = {
@@ -138,6 +139,23 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   infoL.addTo(mymap);
 
+  $.getJSON('/stops/710',function(data){
+    for(stop of data){
+      let i = 0;
+      let lat = stop.stop_lat;
+      let lon = stop.stop_lon;
+      let circle = L.circle([lat, lon], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 100
+      }).addTo(mymap);
+      
+      circleArray.push(circle);
+      i++;
+    }
+  });
+
 
   setInterval(() => displayData(mymap, buslayer, busicon), 1000);
 });
@@ -193,6 +211,8 @@ function initializeRoutes(shape_id_list, data, route_id){
 }
 
 function displayData(mymap, buslayer, busicon) {
+  //for(key in polylineArray){
+  //}
   $.getJSON('/buses', function(data) {
     buslayer.clearLayers();
     for(bus of data){
@@ -232,8 +252,29 @@ function displayData(mymap, buslayer, busicon) {
         rte = parseInt(bus.Route);
       }
       if (x != '-' && y != '-' && !isNaN(rte) && !isNaN(heading) && !isNaN(head)) {
-        let marker = L.marker([xx, yy], { icon: busicon[rte], rotationAngle: head, alt: '' + rte }).bindPopup("<b> Bus " + bus.busNumber + " is on Route: "+ bus.route.substr(start,end).replace(/\s+|\)/g, '') + "</b>").addTo(buslayer);
+        let marker = L.marker([xx, yy], {icon: busicon[rte], rotationAngle: head, alt: '' + rte }).bindPopup("<b> Bus " + bus.busNumber + " is on Route: "+ bus.route.substr(start,end).replace(/\s+|\)/g, '') + "</b>").addTo(buslayer);
+        
+        if(bus.route.substr(start,end).replace(/\s+|\)/g, '') == '710'){
+        for(i = 0; i < circleArray.length; i++){
+          
+          let d = mymap.distance(marker.getLatLng(),circleArray[i].getLatLng());
+          let inside = d < circleArray[i].getRadius();
+          //console.log("distance: " +d);
+          //console.log(''+stop);
+          //console.log(bus.route.substr(start,end).replace(/\s+|\)/g, ''));
+          if(inside){
+            console.log("its in side");
+            circleArray[i].setStyle({
+              fillColor: 'green'
+            })
+          }
+          
+        }
+        //console.log("pie "+i);
       }
+      
+      }
+    
     }
     mymap.invalidateSize();
   });
