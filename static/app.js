@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fillColor: '#f03',
         fillOpacity: 0.5,
         radius: 100
-      }).addTo(mymap);
+      }).addTo(polylineArray['710']);
       
       circleArray.push(circle);
       i++;
@@ -253,29 +253,30 @@ function displayData(mymap, buslayer, busicon) {
       }
       if (x != '-' && y != '-' && !isNaN(rte) && !isNaN(heading) && !isNaN(head)) {
         let marker = L.marker([xx, yy], {icon: busicon[rte], rotationAngle: head, alt: '' + rte }).bindPopup("<b> Bus " + bus.busNumber + " is on Route: "+ bus.route.substr(start,end).replace(/\s+|\)/g, '') + "</b>").addTo(buslayer);
-        
         if(bus.route.substr(start,end).replace(/\s+|\)/g, '') == '710'){
-        for(i = 0; i < circleArray.length; i++){
-          
-          let d = mymap.distance(marker.getLatLng(),circleArray[i].getLatLng());
-          let inside = d < circleArray[i].getRadius();
-          //console.log("distance: " +d);
-          //console.log(''+stop);
-          //console.log(bus.route.substr(start,end).replace(/\s+|\)/g, ''));
-          if(inside){
-            console.log("its in side");
-            circleArray[i].setStyle({
-              fillColor: 'green'
-            })
-          }
-          
+          geofence(mymap,marker);
         }
-        //console.log("pie "+i);
-      }
-      
       }
     
     }
     mymap.invalidateSize();
   });
+}
+
+function geofence(mymap,marker){
+    for(i = 0; i < circleArray.length; i++){
+      
+      let d = mymap.distance(marker.getLatLng(),circleArray[i].getLatLng());
+      let inside = d < circleArray[i].getRadius();
+      if(inside){
+        circleArray[i].setStyle({
+          fillColor: 'green'
+        })
+      }
+      else{
+        circleArray[i].setStyle({
+          fillColor: '#f03'
+        })
+      }          
+    }
 }
