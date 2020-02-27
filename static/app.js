@@ -4,7 +4,7 @@ let info = L.control();
 let infoL = L.control();
 let div;
 let legend;
-let circleArray =[];
+let circleArray = {};
 let polylineArray = {};
 
 let route_shapes = {
@@ -52,7 +52,7 @@ let route_colors =[
 document.addEventListener('DOMContentLoaded', function () {
   const mymap = L.map('mapid').setView([44.0583, -121.3154], 13);
   let buslayer = L.layerGroup().addTo(mymap);
-  for(key in route_shapes){
+  for (let key in route_shapes){
     polylineArray[key] = L.layerGroup().addTo(mymap);
   };
 
@@ -73,22 +73,22 @@ document.addEventListener('DOMContentLoaded', function () {
         popupAnchor:  [0, -10]
       }));
   }
- 
-  for(key in polylineArray){
+
+  for (let key in polylineArray){
     let route = key;
     $.getJSON('/stops/'+key,function(data){
-      for(stop of data){
+      for (let stop of data){
         let lat = stop.stop_lat;
         let lon = stop.stop_lon;
         L.marker([lat, lon]).bindPopup("<b>" + stop.stop_name + "</b><br>Your bus will arive in: ???").addTo(polylineArray[route]);
       }
     });
-    
+
   }
 
   $.getJSON('/shape', function(data) {
     let i = 0;
-    for (key in route_shapes) {
+    for (let key in route_shapes) {
       color = route_colors[i];
       initializeRoutes(route_shapes[key], data, key);
       drawRoute(mymap, key, color);
@@ -105,9 +105,9 @@ document.addEventListener('DOMContentLoaded', function () {
   info.update_info_box = function(data){
     var button = document.createElement("button");
     button.appendChild(document.createTextNode("Refresh Map"));
-    button.addEventListener("click",function(){ 
+    button.addEventListener("click",function(){
       mymap.setView([44.0583, -121.3154], 13);
-      for(key in polylineArray){
+      for (let key in polylineArray){
           mymap.addLayer(polylineArray[key]);
       }
       info.update_info_box();
@@ -121,12 +121,12 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   info.addTo(mymap);
-  
+
   infoL.onAdd = function(){
     legend = L.DomUtil.create('div', 'info');
     legend.innerHTML = '<h4>Route Legend</h4>';
 
-    for(key in polylineArray){
+    for (let key in polylineArray){
       let route_id = key;
       let route_name = document.createElement('p','info');
       route_name.appendChild(document.createTextNode("route " + key+ "\n"));
@@ -139,35 +139,39 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   infoL.addTo(mymap);
 
-  $.getJSON('/stops/710',function(data){
-    for(stop of data){
-      let i = 0;
-      let lat = stop.stop_lat;
-      let lon = stop.stop_lon;
-      let circle = L.circle([lat, lon], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 100
-      }).addTo(polylineArray['710']);
-      
-      circleArray.push(circle);
-      i++;
-    }
-  });
+  for (let id in route_shapes) {
+    $.getJSON('/stops/' + id, function(data) {
+      for (let stop of data) {
+        let i = 0;
+        let lat = stop.stop_lat;
+        let lon = stop.stop_lon;
+        let circle = L.circle([lat, lon], {
+          color: 'red',
+          fillColor: '#f03',
+          fillOpacity: 0.5,
+          radius: 100
+        }).addTo(polylineArray[id]);
 
-
+        if (id in circleArray) {
+          circleArray[id].push(circle);
+        } else {
+          circleArray[id] = [];
+        }
+        i++;
+      }
+    });
+  }
   setInterval(() => displayData(mymap, buslayer, busicon), 1000);
 });
 
 function clickRoute(mymap, route_id) {
   let shapes = routes.get(route_id);
   let verts = [];
-  for (shape of shapes.values()) {
+  for (let shape of shapes.values()) {
     verts = verts.concat(shape[1]);
   }
   info.update_info_box(route_id);
-  for(key in polylineArray){
+  for (let key in polylineArray){
     if(key == route_id){
       mymap.addLayer(polylineArray[key]);
     }
@@ -180,7 +184,7 @@ function clickRoute(mymap, route_id) {
 
 function drawRoute(mymap, route_id, color) {
   let pointlists = routes.get(route_id);
-  for (pointlist of pointlists) {
+  for (let pointlist of pointlists) {
     let polyline = new L.polyline(pointlist[1], {
       color: color,
       weight: 3,
@@ -189,7 +193,7 @@ function drawRoute(mymap, route_id, color) {
     });
 
     polyline.on('click', e => clickRoute(mymap, route_id)).addTo(polylineArray[route_id]);
-    
+
   }
 }
 
@@ -211,11 +215,11 @@ function initializeRoutes(shape_id_list, data, route_id){
 }
 
 function displayData(mymap, buslayer, busicon) {
-  //for(key in polylineArray){
+  //for (key in polylineArray){
   //}
   $.getJSON('/buses', function(data) {
     buslayer.clearLayers();
-    for(bus of data){
+    for (let bus of data){
       let x = '-';
       let y = '-';
       let xx = 0.0;
@@ -252,31 +256,31 @@ function displayData(mymap, buslayer, busicon) {
         rte = parseInt(bus.Route);
       }
       if (x != '-' && y != '-' && !isNaN(rte) && !isNaN(heading) && !isNaN(head)) {
-        let marker = L.marker([xx, yy], {icon: busicon[rte], rotationAngle: head, alt: '' + rte }).bindPopup("<b> Bus " + bus.busNumber + " is on Route: "+ bus.route.substr(start,end).replace(/\s+|\)/g, '') + "</b>").addTo(buslayer);
-        if(bus.route.substr(start,end).replace(/\s+|\)/g, '') == '710'){
-          geofence(mymap,marker);
+        let route_id = bus.route.substr(start, end).replace(/\s+|\)/g, '');
+        let marker = L.marker([xx, yy], {icon: busicon[rte], rotationAngle: head, alt: '' + rte }).bindPopup("<b> Bus " + bus.busNumber + " is on Route: "+ route_id + "</b>").addTo(buslayer);
+        if(route_id) {
+          geofence(mymap, marker, circleArray[route_id]);
         }
       }
-    
+
     }
     mymap.invalidateSize();
   });
 }
 
-function geofence(mymap,marker){
-    for(i = 0; i < circleArray.length; i++){
-      
-      let d = mymap.distance(marker.getLatLng(),circleArray[i].getLatLng());
-      let inside = d < circleArray[i].getRadius();
-      if(inside){
-        circleArray[i].setStyle({
-          fillColor: 'green'
-        })
-      }
-      else{
-        circleArray[i].setStyle({
-          fillColor: '#f03'
-        })
-      }          
+function geofence(mymap, marker, arr) {
+  for (let circle of arr) {
+    let d = mymap.distance(marker.getLatLng(), circle.getLatLng());
+    let inside = d < circle.getRadius();
+    if (inside) {
+      circle.setStyle({
+        fillColor: 'green'
+      })
     }
+    else {
+      circle.setStyle({
+        fillColor: '#f03'
+      })
+    }
+  }
 }
