@@ -45,7 +45,7 @@ let route_colors =[
   '#00DCFF',
   '#FF00AA',
   '#31FF8F',
-  '#6FFF3',
+  '#6FFF33',
   '#31FFEC',
   '#BD31FF',
   '#FF31FF',
