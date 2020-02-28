@@ -64,12 +64,19 @@ document.addEventListener('DOMContentLoaded', function () {
     id: 'mapbox.streets',
     accessToken: 'pk.eyJ1IjoicnJydWtvIiwiYSI6ImNrMmdiNmV6ODBkejAzY3BoNW90N2RiM3AifQ.P83jUlQTXOXqM5nLW8EhDg'
   }).addTo(mymap);
-  let busicon = L.icon({
-    iconUrl: '/static/icons/busicon.png',
-    iconSize:     [32, 32],
-    iconAnchor:   [16, 16],
-    popupAnchor:  [0, -10]
-  });
+  let busIcons = [];
+  for(var i = 0; i <= 30; ++i){
+    let busicon = L.icon({
+      iconUrl: '/static/icons/busicon.png',
+      shadowUrl: '/static/icons/rnum/r'+i+'.png',
+      iconSize:     [32, 32],
+      shadowSize:   [32, 32],
+      iconAnchor:   [16, 16],
+      shadowAnchor: [32, 32],
+      popupAnchor:  [0, -10]
+    });
+    busIcons.push(busicon);
+}
 
   for (let key in polylineArray){
     let route = key;
@@ -158,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
-  setInterval(() => displayData(mymap, buslayer, busicon), 1000);
+  setInterval(() => displayData(mymap, buslayer, busIcons), 1000);
 });
 
 function clickRoute(mymap, route_id) {
@@ -211,7 +218,8 @@ function initializeRoutes(shape_id_list, data, route_id){
   }
 }
 
-function displayData(mymap, buslayer, busicon) {
+function displayData(mymap, buslayer, busIcons) {
+  let rte = 1;
   //for (key in polylineArray){
   //}
   $.getJSON('/buses', function(data) {
@@ -223,7 +231,6 @@ function displayData(mymap, buslayer, busicon) {
       let yy = 0.0;
       let heading = '-';
       let head = 0.0;
-      let rte = 0;
       let start = bus.Route.length -5;
       let end = bus.Route.length - 4;
       if (bus.latitude != null) {
@@ -249,15 +256,20 @@ function displayData(mymap, buslayer, busicon) {
         head = parseFloat(heading) + 90;
         if (head > 360) head = head - 360;
       }
-      console.log('flasklfls' + bus.Route);
       if (x != '-' && y != '-' && !isNaN(parseInt(bus.Route)) && !isNaN(heading) && !isNaN(head)) {
-        console.log('aaaaaaaaaaaaaaaa')
-        let marker = L.marker([xx, yy], {icon: busicon, rotationAngle: head, alt: '' + bus.Route }).bindPopup("<b> Bus " + bus.bus + " is on Route: "+ bus.Route + "</b>").addTo(buslayer);
+        let marker = L.marker([xx, yy], {icon: busIcons[bus], rotationAngle: head, alt: '' + bus.Route }).bindPopup("<b> Bus " + bus.bus + " is on Route: "+ bus.Route + "</b>").addTo(buslayer);
+        rte++;
+        //console.log(rte);
         if(bus.Route) {
-          geofence(mymap, marker, circleArray[parseInt(bus.Route)]);
+          let routetest = parseInt(bus.Route);
+          if(routetest in circleArray){
+            geofence(mymap, marker, circleArray[routetest]);
+          }
+          else{
+            console.log("route "+routetest+" is not in the listing");
+          }
         }
       }
-
     }
     mymap.invalidateSize();
   });
@@ -279,12 +291,3 @@ function geofence(mymap, marker, arr) {
     }
   }
 }
-
-/*
-  give stops the color of their routes,
-  give buses numbers,
-  have geofence work with direction,
-  have geofence toggle?
-  dont report that bus is at stop multiple times
-  remember what next stop is for geofence
-*/
