@@ -8,6 +8,7 @@ let prevstop;
 let legend;
 let circleArray = {};
 let polylineArray = {};
+let route_direction ={};
 
 let route_shapes = {
   '290': ["p_30", "p_31", "p_746", "p_747", "p_748"],
@@ -56,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let buslayer = L.layerGroup().addTo(mymap);
   for (let key in route_shapes){
     polylineArray[key] = L.layerGroup().addTo(mymap);
+    //route_direction[key] = 3;
   };
 
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -257,7 +259,7 @@ function displayData(mymap, buslayer, busIcons) {
         if (head > 360) head = head - 360;
       }
       if (x != '-' && y != '-' && !isNaN(parseInt(bus.Route)) && !isNaN(heading) && !isNaN(head)) {
-        let marker = L.marker([xx, yy], {icon: busIcons[bus], rotationAngle: head, alt: '' + bus.Route }).bindPopup("<b> Bus " + bus.bus + " is on Route: "+ bus.Route + "</b>").addTo(buslayer);
+        let marker = L.marker([xx, yy], {icon: busIcons[rte], rotationAngle: head, alt: '' + bus.Route }).bindPopup("<b> Bus " + bus.bus + " is on Route: "+ bus.Route + "</b>").addTo(buslayer);
         rte++;
         //console.log(rte);
         if(bus.Route) {
