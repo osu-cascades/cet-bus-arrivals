@@ -36,13 +36,25 @@ def js():
 
 @app.route('/buses')
 def buses():
-  handle = urllib.request.urlopen('http://ridecenter.org:7016')
-  json_str = handle.read().decode('utf8')
-  soup = BeautifulSoup(json_str, 'html.parser')
-  json_obj = json.loads(soup.body.string)
-  for bus_record in json_obj:
-    bus_record['route'] = str(guess_route(shapes, bus_record))
-  print(json_obj)
+  handle = urllib.request.urlopen('http://ridecenter.org:7017/list')
+  json_obj = json.loads(handle.read().decode('utf8'))
+  cursor = get_db().cursor()
+  routes = cursor.execute('''
+    select route_short_name, route_id from routes;
+  ''')
+  route_map = {}
+  for route in routes:
+    try:
+      int_id = int(route[0])
+      route_map[int_id] = int(route[1])
+    except:
+      route_map[route[0]] = int(route[1])
+  for bus in json_obj:
+    try:
+      int_id = int(bus['Route'])
+      bus['Route'] = route_map[int_id]
+    except:
+      bus['Route'] = route_map[bus['Route']]
   response = app.response_class(
     response=json.dumps(json_obj),
     mimetype='application/json'
@@ -93,7 +105,7 @@ def stop_info_on_route(route_id):
     mimetype='application/json'
   )
   return response
-    
+
 
 @app.route('/shape')
 def shape():

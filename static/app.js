@@ -62,17 +62,12 @@ document.addEventListener('DOMContentLoaded', function () {
     id: 'mapbox.streets',
     accessToken: 'pk.eyJ1IjoicnJydWtvIiwiYSI6ImNrMmdiNmV6ODBkejAzY3BoNW90N2RiM3AifQ.P83jUlQTXOXqM5nLW8EhDg'
   }).addTo(mymap);
-  let busicon = [];
-
-  for (let i = 0; i <= 30; i++) {
-    busicon.push(
-      L.icon({
-        iconUrl: '/static/icons/busicon.png',
-        iconSize:     [32, 32],
-        iconAnchor:   [16, 16],
-        popupAnchor:  [0, -10]
-      }));
-  }
+  let busicon = L.icon({
+    iconUrl: '/static/icons/busicon.png',
+    iconSize:     [32, 32],
+    iconAnchor:   [16, 16],
+    popupAnchor:  [0, -10]
+  });
 
   for (let key in polylineArray){
     let route = key;
@@ -227,8 +222,8 @@ function displayData(mymap, buslayer, busicon) {
       let heading = '-';
       let head = 0.0;
       let rte = 0;
-      let start = bus.route.length -5;
-      let end = bus.route.length - 4;
+      let start = bus.Route.length -5;
+      let end = bus.Route.length - 4;
       if (bus.latitude != null) {
         x = bus.latitude;
         try {
@@ -252,14 +247,12 @@ function displayData(mymap, buslayer, busicon) {
         head = parseFloat(heading) + 90;
         if (head > 360) head = head - 360;
       }
-      if (bus.Route != null) {
-        rte = parseInt(bus.Route);
-      }
-      if (x != '-' && y != '-' && !isNaN(rte) && !isNaN(heading) && !isNaN(head)) {
-        let route_id = bus.route.substr(start, end).replace(/\s+|\)/g, '');
-        let marker = L.marker([xx, yy], {icon: busicon[rte], rotationAngle: head, alt: '' + rte }).bindPopup("<b> Bus " + bus.busNumber + " is on Route: "+ route_id + "</b>").addTo(buslayer);
-        if(route_id) {
-          geofence(mymap, marker, circleArray[route_id]);
+      console.log('flasklfls' + bus.Route);
+      if (x != '-' && y != '-' && !isNaN(parseInt(bus.Route)) && !isNaN(heading) && !isNaN(head)) {
+        console.log('aaaaaaaaaaaaaaaa')
+        let marker = L.marker([xx, yy], {icon: busicon, rotationAngle: head, alt: '' + bus.Route }).bindPopup("<b> Bus " + bus.bus + " is on Route: "+ bus.Route + "</b>").addTo(buslayer);
+        if(bus.Route) {
+          geofence(mymap, marker, circleArray[parseInt(bus.Route)]);
         }
       }
 
