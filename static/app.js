@@ -3,6 +3,8 @@ let routes = new Map();
 let info = L.control();
 let infoL = L.control();
 let div;
+let direction;
+let prevstop;
 let legend;
 let circleArray =[];
 let polylineArray = {};
@@ -272,6 +274,16 @@ function geofence(mymap,marker){
         circleArray[i].setStyle({
           fillColor: 'green'
         })
+       $.getJSON('/stops/710',function(data){
+          for(stop of data){
+            let lat = stop.stop_lat;
+            let lon = stop.stop_lon;
+            if(console.log(circleArray[i].equals([lat,lon]))){
+              console.log("true");
+            }
+          }
+          
+        });
       }
       else{
         circleArray[i].setStyle({
@@ -280,3 +292,12 @@ function geofence(mymap,marker){
       }          
     }
 }
+
+/*
+  give stops the color of their routes,
+  give buses numbers,
+  have geofence work with direction,
+  have geofence toggle?
+  dont report that bus is at stop multiple times
+  remember what next stop is for geofence
+*/
