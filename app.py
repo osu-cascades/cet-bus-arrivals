@@ -89,15 +89,27 @@ def stops_on_route(route_id):
 def stop_info_on_route(route_id):
   cursor = get_db().cursor()
   stops = cursor.execute('''
-  select trips.route_id, stops.stop_id, trips.direction_id, trips.trip_headsign, stops.stop_name from calendar join trips on trips.service_id=calendar.service_id join routes on trips.route_id=routes.route_id join stop_times on trips.trip_id=stop_times.trip_id join stops on stop_times.stop_id=stops.stop_id where trips.route_id=? order by departure_time,direction_id,shape_dist_traveled limit 100000000;''', (route_id, ))
+    select departure_time, trips.route_id, stops.stop_id, trips.direction_id, trips.trip_headsign, stops.stop_name, trips.trip_id, stop_sequence
+    from calendar
+    join trips on trips.service_id=calendar.service_id
+    join routes on trips.route_id=routes.route_id
+    join stop_times on trips.trip_id=stop_times.trip_id
+    join stops on stop_times.stop_id=stops.stop_id
+    where trips.route_id=?
+    order by trips.service_id,departure_time,direction_id,cast(shape_dist_traveled as real)
+    limit 100000000;
+  ''', (route_id, ))
   json_obj = []
   for stop in stops:
     json_obj.append({
-      'route_id': stop[0],
-      'stop_id': stop[1],
-      'direction_id': stop[2],
-      'trip_headsign': stop[3],
-      'stop_name': stop[4]
+      'departure_time': stop[0],
+      'route_id': stop[1],
+      'stop_id': stop[2],
+      'direction_id': stop[3],
+      'trip_headsign': stop[4],
+      'stop_name': stop[5],
+      'trip_id': stop[6],
+      'stop_sequence': stop[7]
     })
 
   response = app.response_class(
