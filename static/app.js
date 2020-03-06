@@ -332,11 +332,11 @@ function geofence(mymap, marker, arr) {
     let d = mymap.distance(marker.getLatLng(), circle.getLatLng());
     let inside = d < circle.getRadius();
     if (inside) {
+      detect_direction_change(stop_id);
       if(curr_direction == direction){
         circle.setStyle({
           fillColor: 'green'
         })
-        detect_direction_change(stop_id);
       }
     }
     else {
