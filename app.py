@@ -89,7 +89,7 @@ def stops_on_route(route_id):
 def stop_info_on_route(route_id):
   cursor = get_db().cursor()
   stops = cursor.execute('''
-    select departure_time, trips.route_id, stops.stop_id, trips.direction_id, trips.trip_headsign, stops.stop_name, trips.trip_id, stop_sequence
+    select stop_lat,stop_lon,trips.direction_id, stop_sequence,departure_time, trips.route_id, stops.stop_id, trips.trip_headsign, stops.stop_name, trips.trip_id
     from calendar
     join trips on trips.service_id=calendar.service_id
     join routes on trips.route_id=routes.route_id
@@ -102,14 +102,16 @@ def stop_info_on_route(route_id):
   json_obj = []
   for stop in stops:
     json_obj.append({
-      'departure_time': stop[0],
-      'route_id': stop[1],
-      'stop_id': stop[2],
-      'direction_id': stop[3],
-      'trip_headsign': stop[4],
-      'stop_name': stop[5],
-      'trip_id': stop[6],
-      'stop_sequence': stop[7]
+      'stop_lat': stop[0],
+      'stop_lon': stop[1],
+      'direction_id': stop[2],
+      'stop_sequence': stop[3],
+      'departure_time': stop[4],
+      'route_id': stop[5],
+      'stop_id': stop[6],
+      'trip_headsign': stop[7],
+      'stop_name': stop[8],
+      'trip_id': stop[9],
     })
 
   response = app.response_class(

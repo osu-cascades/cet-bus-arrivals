@@ -3,7 +3,7 @@ let routes = new Map();
 let info = L.control();
 let infoL = L.control();
 let div;
-let direction;
+let curr_direction = 0;
 let prevstop;
 let legend;
 let circleArray = {};
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return legend;
   }
   infoL.addTo(mymap);
-
+  
   for (let id in route_shapes) {
     $.getJSON('/stops/' + id, function(data) {
       for (let stop of data) {
@@ -152,20 +152,50 @@ document.addEventListener('DOMContentLoaded', function () {
         let lat = stop.stop_lat;
         let lon = stop.stop_lon;
         let circle = L.circle([lat, lon], {
-          color: 'red',
-          fillColor: '#f03',
-          fillOpacity: 0.5,
-          radius: 100
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 100
         }).addTo(polylineArray[id]);
-
-        if (id in circleArray) {
-          circleArray[id].push(circle);
-        } else {
-          circleArray[id] = [];
-        }
+        $.getJSON('stops_info/'+id,function(data){
+          for(let stop_info of data){
+            let stop_lat = stop_info.stop_lat;
+            let stop_lon = stop_info.stop_lon;
+            let stop_name = stop_info.stop_name;
+            if(lat == stop_lat && lon == stop_lon){
+              if(stop_name == 'Hawthorne Station'){
+                if (id in circleArray) {
+                  circleArray[id].push([circle, stop.stop_id,0]);
+                  break;
+                } else {
+                  circleArray[id] = [];
+                  break;
+                }
+              }else if(stop_name == 'Walmart'){
+                if (id in circleArray) {
+                  circleArray[id].push([circle, stop.stop_id,1]);
+                  break;
+                } else {
+                  circleArray[id] = [];
+                  break;
+              }
+              }
+              else{
+                if (id in circleArray) {
+                  circleArray[id].push([circle, stop.stop_id,parseInt(stop_info.direction_id)]);
+                  break;
+                } else {
+                  circleArray[id] = [];
+                  break;
+                  }
+              }
+            }
+          }
+        });
         i++;
       }
     });
+    
   }
   setInterval(() => displayData(mymap, buslayer, busIcons), 1000);
 });
@@ -268,7 +298,7 @@ function displayData(mymap, buslayer, busIcons) {
             geofence(mymap, marker, circleArray[routetest]);
           }
           else{
-            console.log("route "+routetest+" is not in the listing");
+           // console.log("route "+routetest+" is not in the listing");
           }
         }
       }
@@ -277,14 +307,37 @@ function displayData(mymap, buslayer, busIcons) {
   });
 }
 
+function detect_direction_change(currstop_id){
+  $.getJSON('/stops/710',function(data){
+    for (let stop of data){
+      let stop_id = stop.stop_id
+      if(stop_id == currstop_id){
+        if(stop_id == '2456761'){
+          curr_direction = 0;
+        }
+        else if(stop_id == '21004'){
+          curr_direction = 1;
+        }
+      }    
+    }
+  });
+  //return direction;
+}
+
+// two circles on top of each other and still finding direction 
+// first stop hit is hawthorn staition or the other end point
+
 function geofence(mymap, marker, arr) {
-  for (let circle of arr) {
+  for (let [circle,stop_id,direction] of arr) {
     let d = mymap.distance(marker.getLatLng(), circle.getLatLng());
     let inside = d < circle.getRadius();
     if (inside) {
-      circle.setStyle({
-        fillColor: 'green'
-      })
+      if(curr_direction == direction){
+        circle.setStyle({
+          fillColor: 'green'
+        })
+        detect_direction_change(stop_id);
+      }
     }
     else {
       circle.setStyle({
