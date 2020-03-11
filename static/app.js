@@ -299,7 +299,7 @@ function displayData(mymap, buslayer, busIcons) {
           if(routetest in circleArray){   
             if(routetest == 710){
               geofence(mymap, marker, circleArray[routetest],routetest);
-              buslocation = [xx,yy];
+              buslocation = {lat: xx,lng: yy};
             }
           }
           else{
@@ -336,16 +336,20 @@ function detect_direction_change(currstop_id){
 
 function geofence(mymap, marker, arr,routetest) {
   for (let [circle,stop_id,direction] of arr) {
+    console.log(marker.getLatLng());
     let d = mymap.distance(marker.getLatLng(), circle.getLatLng());
     let inside = d < circle.getRadius();
+    let was_inside = buslocation && (mymap.distance(buslocation, circle.getLatLng()) < circle.getRadius());
     if (inside) {
       detect_direction_change(stop_id);
       if(curr_direction == direction){
-        fetch('/arrival', {
+        if(!was_inside){
+           fetch('/arrival', {
           method: 'POST', 
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify({stop_id,time:Date.now(),route_id:routetest})
-        })
+        }) 
+      }
         circle.setStyle({
           fillColor: 'green'
         })

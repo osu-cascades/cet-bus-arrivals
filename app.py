@@ -16,6 +16,12 @@ def get_db():
     db = g._database = sqlite3.connect('./gtfs.db')
   return db
 
+def get_logging_db():
+  db = getattr(g, '_logging_database', None)
+  if db is None:
+    db = g._logging_database = sqlite3.connect('./log.db')
+  return db
+
 with open('templates/shape.json') as shape_file:
   with open('templates/trips.json') as trips_file:
     shape_json = json.loads(shape_file.read())
@@ -63,7 +69,13 @@ def buses():
 
 @app.route('/arrival', methods=['POST'])
 def bus_arrival():
-  print(request.json)
+  payload = request.json
+  logging_db = get_logging_db()
+  cursor = logging_db.cursor()
+  cursor.execute(''' 
+    insert into arrivals values (?,?,?)
+  ''',(payload['route_id'],payload['stop_id'],payload['time']))
+  logging_db.commit()
   return ''
 
 @app.route('/stops/<route_id>')
