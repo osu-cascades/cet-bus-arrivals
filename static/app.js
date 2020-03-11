@@ -31,6 +31,8 @@ let route_shapes = {
   '3225': ["p_180576","p_9617","p_180573","p_180574","p_111380"]
 };
 
+let buslocation = null;
+
 let route_colors =[
   'red',
   'blue',
@@ -294,13 +296,18 @@ function displayData(mymap, buslayer, busIcons) {
         //console.log(rte);
         if(bus.Route) {
           let routetest = parseInt(bus.Route);
-          if(routetest in circleArray){
-            geofence(mymap, marker, circleArray[routetest]);
+          if(routetest in circleArray){   
+            if(routetest == 710){
+              geofence(mymap, marker, circleArray[routetest],routetest);
+              buslocation = [xx,yy];
+            }
           }
           else{
            // console.log("route "+routetest+" is not in the listing");
           }
         }
+        
+        
       }
     }
     mymap.invalidateSize();
@@ -327,13 +334,18 @@ function detect_direction_change(currstop_id){
 // two circles on top of each other and still finding direction 
 // first stop hit is hawthorn staition or the other end point
 
-function geofence(mymap, marker, arr) {
+function geofence(mymap, marker, arr,routetest) {
   for (let [circle,stop_id,direction] of arr) {
     let d = mymap.distance(marker.getLatLng(), circle.getLatLng());
     let inside = d < circle.getRadius();
     if (inside) {
       detect_direction_change(stop_id);
       if(curr_direction == direction){
+        fetch('/arrival', {
+          method: 'POST', 
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({stop_id,time:Date.now(),route_id:routetest})
+        })
         circle.setStyle({
           fillColor: 'green'
         })

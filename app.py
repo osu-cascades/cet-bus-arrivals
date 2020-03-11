@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, jsonify, g
+from flask import Flask, render_template, url_for, jsonify, g, request
 
 import urllib.request
 import json
@@ -60,6 +60,11 @@ def buses():
     mimetype='application/json'
   )
   return response
+
+@app.route('/arrival', methods=['POST'])
+def bus_arrival():
+  print(request.json)
+  return ''
 
 @app.route('/stops/<route_id>')
 def stops_on_route(route_id):
