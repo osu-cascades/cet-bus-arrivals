@@ -158,6 +158,10 @@ def stops():
 def css():
   return render_template('index.css')
 
+@app.route('/bus_location.json')
+def bus_location():
+  return render_template('bus_location.json')
+
 @app.route('/test')
 def test():
   return 'test'

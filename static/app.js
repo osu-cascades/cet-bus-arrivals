@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
       popupAnchor:  [0, -10]
     });
     busIcons.push(busicon);
-}
+  }
 
   for (let key in polylineArray){
     let route = key;
@@ -256,62 +256,63 @@ function displayData(mymap, buslayer, busIcons) {
   let rte = 1;
   //for (key in polylineArray){
   //}
-  $.getJSON('/buses', function(data) {
-    buslayer.clearLayers();
-    for (let bus of data){
-      let x = '-';
-      let y = '-';
-      let xx = 0.0;
-      let yy = 0.0;
-      let heading = '-';
-      let head = 0.0;
-      let start = bus.Route.length -5;
-      let end = bus.Route.length - 4;
-      if (bus.latitude != null) {
-        x = bus.latitude;
-        try {
-          xx = parseFloat(x);
-        } catch (err) {
-          x = '-';
-          xx = 0.0;
+  
+  $.getJSON('/bus_location.json',function(data){
+    //o = { a: { "current_stop": 1,"route_id": 2, "lat": 3, "long": 4} };
+    for (let bus_data in data) { 
+      buslayer.clearLayers();
+      for(let bus_data in data){
+        lat = data[bus_data]["lat"];
+        long = data[bus_data]["long"];
+        route = data[bus_data]["route_id"]
+        let x = '-';
+        let y = '-';
+        let xx = 0.0;
+        let yy = 0.0;
+        let heading = '-';
+        let head = 0.0;
+        if (lat != null) {
+          x = lat;
+          try {
+            xx = parseFloat(x);
+          } catch (err) {
+            x = '-';
+            xx = 0.0;
+          }
         }
-      }
-      if (bus.longitude != null) {
-        y = bus.longitude;
-        try {
-          yy = parseFloat(y);
-        } catch (err) {
-          y = '-';
-          yy = 0.0;
+        if (long!= null) {
+          y = long;
+          try {
+            yy = parseFloat(y);
+          } catch (err) {
+            y = '-';
+            yy = 0.0;
+          }
         }
-      }
-      if (bus.heading != null) {
-        heading = bus.heading;
-        head = parseFloat(heading) + 90;
-        if (head > 360) head = head - 360;
-      }
-      if (x != '-' && y != '-' && !isNaN(parseInt(bus.Route)) && !isNaN(heading) && !isNaN(head)) {
-        let marker = L.marker([xx, yy], {icon: busIcons[rte], rotationAngle: head, alt: '' + bus.Route }).bindPopup("<b> Bus " + bus.bus + " is on Route: "+ bus.Route + "</b>").addTo(buslayer);
-        rte++;
-        //console.log(rte);
-        if(bus.Route) {
-          let routetest = parseInt(bus.Route);
-          if(routetest in circleArray){   
-            if(routetest == 710){
-              geofence(mymap, marker, circleArray[routetest],routetest);
-              buslocation = {lat: xx,lng: yy};
+        if (x != '-' && y != '-' && !isNaN(parseInt(route))) {
+          let marker = L.marker([xx, yy], {icon: busIcons[rte], alt: '' + route }).bindPopup("<b> Bus " + bus_data + " is on Route: "+ route + "</b>").addTo(buslayer);
+          rte++;
+          //console.log(rte);
+          if(route) {
+            let routetest = parseInt(route);
+            if(routetest in circleArray){   
+              if(routetest == 710){
+                geofence(mymap, marker, circleArray[routetest],routetest);
+                buslocation = {lat: xx,lng: yy};
+              }
+            }
+            else{
+            // console.log("route "+routetest+" is not in the listing");
             }
           }
-          else{
-           // console.log("route "+routetest+" is not in the listing");
-          }
+          
+          
         }
-        
-        
       }
     }
     mymap.invalidateSize();
   });
+
 }
 
 function detect_direction_change(currstop_id){
@@ -336,7 +337,7 @@ function detect_direction_change(currstop_id){
 
 function geofence(mymap, marker, arr,routetest) {
   for (let [circle,stop_id,direction] of arr) {
-    console.log(marker.getLatLng());
+    //console.log(marker.getLatLng());
     let d = mymap.distance(marker.getLatLng(), circle.getLatLng());
     let inside = d < circle.getRadius();
     let was_inside = buslocation && (mymap.distance(buslocation, circle.getLatLng()) < circle.getRadius());
