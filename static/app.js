@@ -254,11 +254,7 @@ function initializeRoutes(shape_id_list, data, route_id){
 
 function displayData(mymap, buslayer, busIcons) {
   let rte = 1;
-  //for (key in polylineArray){
-  //}
-  
   $.getJSON('/bus_location.json',function(data){
-    //o = { a: { "current_stop": 1,"route_id": 2, "lat": 3, "long": 4} };
     for (let bus_data in data) { 
       buslayer.clearLayers();
       for(let bus_data in data){
@@ -266,47 +262,31 @@ function displayData(mymap, buslayer, busIcons) {
         long = data[bus_data]["long"];
         route = data[bus_data]["route_id"]
         curr_stop = data[bus_data]["current_stop"]
-        let x = '-';
-        let y = '-';
-        let xx = 0.0;
-        let yy = 0.0;
-        let heading = '-';
-        let head = 0.0;
+        let x = 0.0;
+        let y = 0.0;
         if (lat != null) {
-          x = lat;
           try {
-            xx = parseFloat(x);
+            x = lat;
           } catch (err) {
-            x = '-';
-            xx = 0.0;
+            x = 0.0;
           }
         }
         if (long!= null) {
-          y = long;
           try {
-            yy = parseFloat(y);
+            y = long;
           } catch (err) {
-            y = '-';
-            yy = 0.0;
+            y = 0.0;
           }
         }
-        if (x != '-' && y != '-' && !isNaN(parseInt(route))) {
-          let marker = L.marker([xx, yy], {icon: busIcons[rte], alt: '' + route }).bindPopup("<b> Bus " + bus_data + " is on Route: "+ route + "</b>").addTo(buslayer);
+        if (x != 0.0 && y != 0.0 && !isNaN(parseInt(route))) {
+          let marker = L.marker([x, y], {icon: busIcons[rte], alt: '' + route }).bindPopup("<b> Bus " + bus_data + " is on Route: "+ route + "</b>").addTo(buslayer);
           rte++;
-          //console.log(rte);
           if(route) {
             let routetest = parseInt(route);
             if(routetest in circleArray){   
                 geofence(circleArray[routetest],curr_stop);
-                
-              
-            }
-            else{
-            // console.log("route "+routetest+" is not in the listing");
             }
           }
-          
-          
         }
       }
     }
