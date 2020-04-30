@@ -1,10 +1,7 @@
-let focusedRoute = null;
 let routes = new Map();
 let info = L.control();
 let infoL = L.control();
 let div;
-let curr_direction = 0;
-let prevstop;
 let legend;
 let circleArray = {};
 let polylineArray = {};
@@ -59,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function () {
   let buslayer = L.layerGroup().addTo(mymap);
   for (let key in route_shapes){
     polylineArray[key] = L.layerGroup().addTo(mymap);
-    //route_direction[key] = 3;
   };
 
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -165,32 +161,13 @@ document.addEventListener('DOMContentLoaded', function () {
             let stop_lon = stop_info.stop_lon;
             let stop_name = stop_info.stop_name;
             if(lat == stop_lat && lon == stop_lon){
-              if(stop_name == 'Hawthorne Station'){
-                if (id in circleArray) {
-                  circleArray[id].push([circle, stop.stop_id,0]);
-                  break;
-                } else {
-                  circleArray[id] = [];
-                  break;
+              if (id in circleArray) {
+                circleArray[id].push([circle, stop.stop_id]);
+                break;
+              } else {
+                circleArray[id] = [];
+                break;
                 }
-              }else if(stop_name == 'Walmart'){
-                if (id in circleArray) {
-                  circleArray[id].push([circle, stop.stop_id,1]);
-                  break;
-                } else {
-                  circleArray[id] = [];
-                  break;
-              }
-              }
-              else{
-                if (id in circleArray) {
-                  circleArray[id].push([circle, stop.stop_id,parseInt(stop_info.direction_id)]);
-                  break;
-                } else {
-                  circleArray[id] = [];
-                  break;
-                  }
-              }
             }
           }
         });
