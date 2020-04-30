@@ -265,6 +265,7 @@ function displayData(mymap, buslayer, busIcons) {
         lat = data[bus_data]["lat"];
         long = data[bus_data]["long"];
         route = data[bus_data]["route_id"]
+        curr_stop = data[bus_data]["current_stop"]
         let x = '-';
         let y = '-';
         let xx = 0.0;
@@ -296,10 +297,9 @@ function displayData(mymap, buslayer, busIcons) {
           if(route) {
             let routetest = parseInt(route);
             if(routetest in circleArray){   
-              if(routetest == 710){
-                geofence(mymap, marker, circleArray[routetest],routetest);
-                buslocation = {lat: xx,lng: yy};
-              }
+                geofence(circleArray[routetest],curr_stop);
+                
+              
             }
             else{
             // console.log("route "+routetest+" is not in the listing");
@@ -315,46 +315,12 @@ function displayData(mymap, buslayer, busIcons) {
 
 }
 
-function detect_direction_change(currstop_id){
-  $.getJSON('/stops/710',function(data){
-    for (let stop of data){
-      let stop_id = stop.stop_id
-      if(stop_id == currstop_id){
-        if(stop_id == '2456761'){
-          curr_direction = 0;
-        }
-        else if(stop_id == '21004'){
-          curr_direction = 1;
-        }
-      }    
-    }
-  });
-  //return direction;
-}
-
-// two circles on top of each other and still finding direction 
-// first stop hit is hawthorn staition or the other end point
-
-function geofence(mymap, marker, arr,routetest) {
-  for (let [circle,stop_id,direction] of arr) {
-    //console.log(marker.getLatLng());
-    let d = mymap.distance(marker.getLatLng(), circle.getLatLng());
-    let inside = d < circle.getRadius();
-    let was_inside = buslocation && (mymap.distance(buslocation, circle.getLatLng()) < circle.getRadius());
-    if (inside) {
-      detect_direction_change(stop_id);
-      if(curr_direction == direction){
-        if(!was_inside){
-           fetch('/arrival', {
-          method: 'POST', 
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({stop_id,time:Date.now(),route_id:routetest})
-        }) 
-      }
-        circle.setStyle({
-          fillColor: 'green'
-        })
-      }
+function geofence(route_geofence_array,curr_stop){
+  for(let [circle,stop_id,direction] of route_geofence_array){
+    if(curr_stop == stop_id){
+      circle.setStyle({
+        fillColor: 'green'
+      })
     }
     else {
       circle.setStyle({
