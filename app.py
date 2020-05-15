@@ -8,6 +8,16 @@ import os
 
 app = Flask(__name__)
 
+LOGGING_SERVICE_URL = None
+
+try:
+  LOGGING_SERVICE_URL = os.environ['LOGGING_SERVICE_URL']
+except:
+  print('There is no logging service url configured. '
+        'You can configure it by setting the environment variable'
+        '$LOGGING_SERVICE_URL.')
+  exit()
+
 def get_db():
   db = getattr(g, '_database', None)
   if db is None:
@@ -30,9 +40,8 @@ def routeShow():
 
 @app.route('/app.js')
 def js():
-  logging_service_url = os.environ['LOGGING_SERVICE_URL']
   return render_template('app.js',
-    logging_service_url=logging_service_url)
+    logging_service_url=LOGGING_SERVICE_URL)
 
 @app.route('/buses')
 def buses():
