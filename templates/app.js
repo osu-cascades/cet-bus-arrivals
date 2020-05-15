@@ -239,8 +239,10 @@ function displayData(mymap, buslayer, busIcons) {
       console.log(bus_data)
       lat = bus_positions[bus_data]["lat"];
       long = bus_positions[bus_data]["lon"];
-      route = bus_positions[bus_data]["route_id"]
-      curr_stop = latest_stops[bus_data][0]
+      route = bus_positions[bus_data]["route_id"];
+      curr_stops = latest_stops[bus_data];
+      curr_stop = curr_stops[0] ? curr_stops[0]["stop_id"] : null;
+      console.log(curr_stop)
       let x = 0.0;
       let y = 0.0;
       if (lat != null) {
