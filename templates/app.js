@@ -231,7 +231,7 @@ function initializeRoutes(shape_id_list, data, route_id){
 
 function displayData(mymap, buslayer, busIcons) {
   let rte = 1;
-  $.getJSON('http://localhost:5001/',function(data){
+  $.getJSON('{{ logging_service_url }}',function(data){
     buslayer.clearLayers();
     bus_positions = data.bus_positions;
     latest_stops = data.latest_stops;

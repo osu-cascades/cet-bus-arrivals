@@ -4,6 +4,7 @@ import urllib.request
 import json
 import sqlite3
 from bs4 import BeautifulSoup
+import os
 
 from cet_bus.geo import Segment, Point, Polyline
 from cet_bus.bus_routes import enumerate_shapes, guess_route
@@ -38,7 +39,9 @@ def routeShow():
 
 @app.route('/app.js')
 def js():
-  url_for('static', filename='app.js')
+  logging_service_url = os.environ['LOGGING_SERVICE_URL']
+  return render_template('app.js',
+    logging_service_url=logging_service_url)
 
 @app.route('/buses')
 def buses():
