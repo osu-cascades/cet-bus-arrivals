@@ -6,9 +6,6 @@ import sqlite3
 from bs4 import BeautifulSoup
 import os
 
-from cet_bus.geo import Segment, Point, Polyline
-from cet_bus.bus_routes import enumerate_shapes, guess_route
-
 app = Flask(__name__)
 
 def get_db():
@@ -22,12 +19,6 @@ def get_logging_db():
   if db is None:
     db = g._logging_database = sqlite3.connect('./log.db')
   return db
-
-with open('templates/shape.json') as shape_file:
-  with open('templates/trips.json') as trips_file:
-    shape_json = json.loads(shape_file.read())
-    trips_json = json.loads(trips_file.read())
-    shapes = enumerate_shapes(trips_json, shape_json)
 
 @app.route('/')
 def root():
