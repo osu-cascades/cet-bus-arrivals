@@ -231,38 +231,39 @@ function initializeRoutes(shape_id_list, data, route_id){
 
 function displayData(mymap, buslayer, busIcons) {
   let rte = 1;
-  $.getJSON('/bus_location.json',function(data){
-    for (let bus_data in data) { 
-      buslayer.clearLayers();
-      for(let bus_data in data){
-        lat = data[bus_data]["lat"];
-        long = data[bus_data]["long"];
-        route = data[bus_data]["route_id"]
-        curr_stop = data[bus_data]["current_stop"]
-        let x = 0.0;
-        let y = 0.0;
-        if (lat != null) {
-          try {
-            x = lat;
-          } catch (err) {
-            x = 0.0;
-          }
+  $.getJSON('http://localhost:5001/',function(data){
+    buslayer.clearLayers();
+    bus_positions = data.bus_positions;
+    latest_stops = data.latest_stops;
+    for (let bus_data in bus_positions) {
+      console.log(bus_data)
+      lat = bus_positions[bus_data]["lat"];
+      long = bus_positions[bus_data]["lon"];
+      route = bus_positions[bus_data]["route_id"]
+      curr_stop = latest_stops[bus_data][0]
+      let x = 0.0;
+      let y = 0.0;
+      if (lat != null) {
+        try {
+          x = lat;
+        } catch (err) {
+          x = 0.0;
         }
-        if (long!= null) {
-          try {
-            y = long;
-          } catch (err) {
-            y = 0.0;
-          }
+      }
+      if (long!= null) {
+        try {
+          y = long;
+        } catch (err) {
+          y = 0.0;
         }
-        if (x != 0.0 && y != 0.0 && !isNaN(parseInt(route))) {
-          let marker = L.marker([x, y], {icon: busIcons[rte], alt: '' + route }).bindPopup("<b> Bus " + bus_data + " is on Route: "+ route + "</b>").addTo(buslayer);
-          rte++;
-          if(route) {
-            let routetest = parseInt(route);
-            if(routetest in circleArray){   
-                geofence(circleArray[routetest],curr_stop);
-            }
+      }
+      if (x != 0.0 && y != 0.0 && !isNaN(parseInt(route))) {
+        let marker = L.marker([x, y], {icon: busIcons[rte], alt: '' + route }).bindPopup("<b> Bus " + bus_data + " is on Route: "+ route + "</b>").addTo(buslayer);
+        rte++;
+        if(route) {
+          let routetest = parseInt(route);
+          if(routetest in circleArray){
+              geofence(circleArray[routetest],curr_stop);
           }
         }
       }
