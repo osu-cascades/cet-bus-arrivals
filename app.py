@@ -61,17 +61,6 @@ def buses():
   )
   return response
 
-@app.route('/arrival', methods=['POST'])
-def bus_arrival():
-  payload = request.json
-  logging_db = get_logging_db()
-  cursor = logging_db.cursor()
-  cursor.execute(''' 
-    insert into arrivals values (?,?,?)
-  ''',(payload['route_id'],payload['stop_id'],payload['time']))
-  logging_db.commit()
-  return ''
-
 @app.route('/stops/<route_id>')
 def stops_on_route(route_id):
   cursor = get_db().cursor()
