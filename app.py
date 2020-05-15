@@ -24,12 +24,6 @@ def get_db():
     db = g._database = sqlite3.connect('./gtfs.db')
   return db
 
-def get_logging_db():
-  db = getattr(g, '_logging_database', None)
-  if db is None:
-    db = g._logging_database = sqlite3.connect('./log.db')
-  return db
-
 @app.route('/')
 def root():
   return render_template('index.html')
