@@ -144,37 +144,29 @@ document.addEventListener('DOMContentLoaded', function () {
   infoL.addTo(mymap);
   
   for (let id in route_shapes) {
-    $.getJSON('/stops/' + id, function(data) {
-      for (let stop of data) {
-        let i = 0;
-        let lat = stop.stop_lat;
-        let lon = stop.stop_lon;
-        let circle = L.circle([lat, lon], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 100
+    $.getJSON('stops_info/'+id,function(stops_info_data) {
+      let seen = new Set();
+      for(let stop_info of stops_info_data){
+        let stop_lat = stop_info.stop_lat;
+        let stop_lon = stop_info.stop_lon;
+        let stop_name = stop_info.stop_name;
+	if (seen.has(stop_info.stop_id)) {
+          continue;
+	}
+	seen.add(stop_info.stop_id);
+        let circle = L.circle([stop_lat, stop_lon], {
+          color: 'red',
+          fillColor: '#f03',
+          fillOpacity: 0.5,
+          radius: 100
         }).addTo(polylineArray[id]);
-        $.getJSON('stops_info/'+id,function(data){
-          for(let stop_info of data){
-            let stop_lat = stop_info.stop_lat;
-            let stop_lon = stop_info.stop_lon;
-            let stop_name = stop_info.stop_name;
-            if(lat == stop_lat && lon == stop_lon){
-              if (id in circleArray) {
-                circleArray[id].push([circle, stop.stop_id]);
-                break;
-              } else {
-                circleArray[id] = [];
-                break;
-                }
-            }
-          }
-        });
-        i++;
+        if (id in circleArray) {
+          circleArray[id].push([circle, stop_info.stop_id]);
+        } else {
+          circleArray[id] = [];
+        }
       }
     });
-    
   }
   setInterval(() => displayData(mymap, buslayer, busIcons), 1000);
 });
