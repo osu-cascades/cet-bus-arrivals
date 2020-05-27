@@ -2,7 +2,23 @@ This application intermittently polls bus data from a service over HTTP and disp
 
 # Database setup
 
-You need to initialize gtfs.db with recent GTFS data before running. For CET, you can go to [this URL](https://transitfeeds.com/p/cascades-east-transit/440) to download an archive of GTFS data represented in CSV format. You can then import the CSV files into an SQLite database using the `.import` command.
+You need to install sqlite3 and initialize gtfs.db with recent GTFS data before running. For CET, you can go to [this URL](https://transitfeeds.com/p/cascades-east-transit/440) to download an archive of GTFS data represented in CSV format. You can then import the CSV files into an SQLite database using the `.import` command, like this:
+
+```
+$ mkdir gtfs
+$ curl https://openmobilitydata-data.s3-us-west-1.amazonaws.com/public/feeds/cascades-east-transit/440/20200519/gtfs.zip -o gtfs/gtfs.zip
+$ cd gtfs
+$ unzip gtfs.zip
+$ cd ..
+$ sqlite3 gtfs.db
+> .mode csv
+> .import gtfs/calendar.txt
+> .import gtfs/routes.txt
+> .import gtfs/shapes.txt
+> .import gtfs/stops.txt
+> .import gtfs/stop_times.txt
+> .import gtfs/trips.txt
+```
 
 # Python dependencies
 
